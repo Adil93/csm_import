@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
+* @author adilmuthukoya
 * Reads configuration from config/config.properties
 *
 */

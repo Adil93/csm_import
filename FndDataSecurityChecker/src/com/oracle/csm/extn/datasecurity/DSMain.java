@@ -17,7 +17,8 @@ import com.oracle.csm.extn.datasecurity.utils.ConfigurationReaderUtil;
 import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
 
 /**
- * @author dvijayan
+ * 
+ * @author adilmuthukoya
  *
  */
 public class DSMain {
@@ -26,7 +27,8 @@ public class DSMain {
 		ConfigurationReaderUtil.loadConfigurations();
 	}
 
-	private static Map<String, Map<DataSecurityObjects, List<Object>>> objectMap;
+	private static Map<String, Map<DataSecurityObjects, List<Object>>> ootbObjectMap;
+	private static Map<String, Map<DataSecurityObjects, List<Object>>> customObjectMap;
 	private static Logger logger = DSLoggerUtil.getLogger();
 
 	/**
@@ -36,6 +38,7 @@ public class DSMain {
 	public static void main(String[] args) throws JAXBException {
 		try {
 			long start = System.currentTimeMillis();
+
 			// Read all the source object
 			String csmJarFilePath = "/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/CS_NEW_DBS_CSM_18082017_V2.jar";
 			logger.log(Level.INFO, "Reading the CSM jar file");
@@ -44,32 +47,20 @@ public class DSMain {
 			CSMJarReader.read(new URL("jar:file:/" + csmJarFilePath + "!/"));
 
 			// Contains Object name as key and all the depended related objects as the value
-			objectMap = DSObjectsProcessor.proccessMaps();
-			
-			logger.log(Level.INFO, "Successfully Proccessed CSM source data");
+			logger.log(Level.INFO, "Proccessing Objects and its related dependent seed datas");
+			DSObjectsProcessor.proccessMaps();
 
-			// For testing
+			ootbObjectMap = DSObjectsProcessor.getOotbObjectMap();
+			customObjectMap = DSObjectsProcessor.getCustomObjectMap();
 
-			if (objectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.GRANTS).size() != 0)
-				System.out.println(
-						"Related Grants1 : " + objectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.GRANTS).get(0));
-			if (objectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.FORM_FUNCIONS).size() != 0)
-				System.out.println("Related FormFunction1: "
-						+ objectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.FORM_FUNCIONS).get(0));
-			if (objectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.MENUS).size() != 0)
-				System.out.println(
-						"Related Menus1: " + objectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.MENUS).get(0));
-			if (objectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.INSTANCE_SETS).size() != 0)
-				System.out.println(
-						"Related Menus1: " + objectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.MENUS).get(0));
+			if (DSObjectsProcessor.validateSourceData(customObjectMap)) {
+				logger.log(Level.INFO, "Source CSM data is Valid");
+			} else {
+				logger.log(Level.INFO, "Source CSM data is Not Valid..!! Please check");
+			}
 
-			System.out.println("Number of FndObjects : " + DSObjectsProcessor.wholeFndObjects.size());
-			System.out.println("Number of FndGrants : " + DSObjectsProcessor.wholeFndGrants.size());
-			System.out.println("Number of FndFormFunciton : " + DSObjectsProcessor.wholeFndFormFunctions.size());
-			System.out.println("Number of FndMeenus : " + DSObjectsProcessor.wholeFndMenus.size());
-
-			System.out.println(System.currentTimeMillis() - start);
-			logger.log(Level.INFO, "Total time taken for execution "+(System.currentTimeMillis() - start)/1000+" seconds");
+			logger.log(Level.INFO,
+					"Total time taken for execution " + (System.currentTimeMillis() - start) / 1000 + " seconds");
 
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block

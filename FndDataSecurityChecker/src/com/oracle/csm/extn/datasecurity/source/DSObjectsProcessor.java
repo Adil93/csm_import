@@ -21,34 +21,33 @@ import com.oracle.csm.extn.datasecurity.model.FndObjectInstanceSet;
 import com.oracle.csm.extn.datasecurity.model.SeedData;
 import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
 
+/**
+ * 
+ * @author adilmuthukoya
+ *
+ */
 public class DSObjectsProcessor {
 
 	private static Logger logger = DSLoggerUtil.getLogger();
 
-	public static List<FndObject> wholeFndObjects = new ArrayList<FndObject>();
-	public static List<FndGrant> wholeFndGrants = new ArrayList<FndGrant>();
-	public static List<FndFormFunction> wholeFndFormFunctions = new ArrayList<FndFormFunction>();
-	public static List<FndMenu> wholeFndMenus = new ArrayList<FndMenu>();
+	private static List<FndObject> wholeFndObjects = new ArrayList<FndObject>();
+	private static List<FndGrant> wholeFndGrants = new ArrayList<FndGrant>();
+	private static List<FndFormFunction> wholeFndFormFunctions = new ArrayList<FndFormFunction>();
+	private static List<FndMenu> wholeFndMenus = new ArrayList<FndMenu>();
+	private static List<FndGrant> zmmAppCompNotesGrants = null;
 
-	// split the map
-	// OOTb and associatd data
-	// Self scanning for custom objects - self scan
-	// if instance set there should be object
-	// Fnd
-	// make sure fnd grant menu present in fnd menu
-	private static Map<String, Map<DataSecurityObjects, List<Object>>> objectMap = new HashMap<String, Map<DataSecurityObjects, List<Object>>>();
-
-	private static Map<String, Map<DataSecurityObjects, List<Object>>> OOTBObjectMap = new HashMap<String, Map<DataSecurityObjects, List<Object>>>();
+	private static Map<String, Map<DataSecurityObjects, List<Object>>> ootbObjectMap = new HashMap<String, Map<DataSecurityObjects, List<Object>>>();
 	private static Map<String, Map<DataSecurityObjects, List<Object>>> customObjectMap = new HashMap<String, Map<DataSecurityObjects, List<Object>>>();
 
 	private static Map<String, FndMenu> menuNameMap = new HashMap<String, FndMenu>();
 	private static Map<String, FndObject> objectNameMap = new HashMap<String, FndObject>();
+	private static Map<String, FndObjectInstanceSet> instanceSetNameMap = new HashMap<String, FndObjectInstanceSet>();
 
 	public DSObjectsProcessor() {
 		// TODO Auto-generated constructor stub
 	}
 
-	protected static void proccessXmls(ByteArrayInputStream byteArrayInputStream, String name) {
+	protected static void proccessXml(ByteArrayInputStream byteArrayInputStream, String name) {
 		JAXBContext jc;
 		try {
 			jc = JAXBContext.newInstance(SeedData.class);
@@ -93,6 +92,10 @@ public class DSObjectsProcessor {
 		if (fndGrants != null) {
 			logger.log(Level.INFO, "Processing file " + fileName);
 
+			if (fileName.contains("ZMM/AppCmmnCompNotes/FndGrantsSD.xml")) {
+				zmmAppCompNotesGrants = fndGrants;
+			}
+
 			for (FndGrant fndGrant : fndGrants) {
 				wholeFndGrants.add(fndGrant);
 
@@ -124,11 +127,17 @@ public class DSObjectsProcessor {
 		}
 	}
 
-	public static Map<String, Map<DataSecurityObjects, List<Object>>> proccessMaps() {
+	public static void proccessMaps() {
 		try {
-			logger.log(Level.INFO, "Processing Object Map ");
+			logger.log(Level.FINE, "Processing Object Map ");
+			Map<String, Map<DataSecurityObjects, List<Object>>> objectMap;
+
+			logger.log(Level.FINE, "Processing All the FndObjects");
 			for (FndObject fndObject : wholeFndObjects) {
+
 				String objName = fndObject.getObjName();
+
+				objectMap = getObjectSpecificMap(objName);
 
 				if (!objectMap.containsKey(objName)) {
 					objectMap.put(objName, new HashMap<DataSecurityObjects, List<Object>>());
@@ -139,14 +148,20 @@ public class DSObjectsProcessor {
 				if (fndObject.getFndObjectInstanceSets() != null)
 					for (FndObjectInstanceSet fndObjectInstanceSet : fndObject.getFndObjectInstanceSets()) {
 						objectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS).add(fndObjectInstanceSet);
+						instanceSetNameMap.put(fndObjectInstanceSet.getInstanceSetName(), fndObjectInstanceSet);
 					}
+
 			}
 
+			logger.log(Level.FINE, "Processing All the FndGrants and related Menus");
 			for (FndGrant fndGrant : wholeFndGrants) {
 				String objName = fndGrant.getObjName();
 
+				objectMap = getObjectSpecificMap(objName);
+
 				if (objectMap.containsKey(objName)) {
 					objectMap.get(objName).get(DataSecurityObjects.GRANTS).add(fndGrant);
+
 					if (fndGrant.getMenuName() != null) {
 						if (menuNameMap.get(fndGrant.getMenuName()) != null)
 							objectMap.get(objName).get(DataSecurityObjects.MENUS)
@@ -192,10 +207,12 @@ public class DSObjectsProcessor {
 					objectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS).add(fndObjectInstanceSet);
 				}
 			}
-
+			logger.log(Level.FINE, "Processing All the FndFormFunctions");
 			for (FndFormFunction fndFormFunction : wholeFndFormFunctions) {
 
 				String objName = fndFormFunction.getObjectName();
+
+				objectMap = getObjectSpecificMap(objName);
 
 				if (objectMap.containsKey(objName)) {
 					objectMap.get(objName).get(DataSecurityObjects.FORM_FUNCIONS).add(fndFormFunction);
@@ -210,7 +227,6 @@ public class DSObjectsProcessor {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return objectMap;
 
 	}
 
@@ -220,5 +236,101 @@ public class DSObjectsProcessor {
 		objectSeedDataMap.put(DataSecurityObjects.MENUS, new ArrayList<Object>());
 		objectSeedDataMap.put(DataSecurityObjects.INSTANCE_SETS, new ArrayList<Object>());
 	}
+
+	private static Map<String, Map<DataSecurityObjects, List<Object>>> getObjectSpecificMap(String objName) {
+		if (objName.endsWith("_c")) {
+			return customObjectMap;
+		} else {
+			return ootbObjectMap;
+		}
+
+	}
+
+	public static boolean validateSourceData(Map<String, Map<DataSecurityObjects, List<Object>>> customObjectMap) {
+		// Write logics for Source data validations
+		logger.log(Level.INFO, "Validating Source CSM data........[Mainly Custom Object validation]");
+		
+		boolean valid = true;
+		
+		// Number of other validations to be added
+		// Just added ZMM_NOTES object dependency with custom object
+		// List<Object> fndGrants = ootbObjectMap.get("ZMM_NOTES").get(DataSecurityObjects.GRANTS);
+		
+		List<FndGrant> fndGrants = null;
+		if (zmmAppCompNotesGrants != null) {
+			fndGrants = zmmAppCompNotesGrants;
+		} else {
+			logger.log(Level.INFO, "No ZMM/AppCmmnCompNotes/FndGrantsSD.xml exists");
+			return false;
+		}
+		List<String> validCustNames = new ArrayList<String>();
+		List<String> InValidCustNames = new ArrayList<String>();
+		for (Map.Entry<String, Map<DataSecurityObjects, List<Object>>> entry : customObjectMap.entrySet()) {
+			boolean foundRelatedFndGrant = false;
+			boolean foundRelMenuAndIS = false;
+			String instanceSetName;
+			String menuName;
+			String custObjName = entry.getKey();
+
+			for (Object obj : fndGrants) {
+				FndGrant fndGrant = (FndGrant) obj;
+				if (fndGrant.getName().toLowerCase().contains(custObjName.toLowerCase())) {
+
+					foundRelatedFndGrant = true;
+					instanceSetName = fndGrant.getInstanceSetName();
+					menuName = fndGrant.getMenuName();
+
+					if (instanceSetNameMap.containsKey(instanceSetName) && menuNameMap.containsKey(menuName)) {
+						foundRelMenuAndIS = true;
+						validCustNames.add(custObjName);
+					}
+
+					break;
+
+				}
+
+			}
+
+			if (!(foundRelatedFndGrant && foundRelMenuAndIS)) {
+				// return false;
+				InValidCustNames.add(custObjName);
+				valid = false;
+
+			}
+
+		}
+		logger.log(Level.INFO, "Invalid Custom Object size : " + InValidCustNames.size());
+		logger.log(Level.INFO, "valid Custom Object size : " + validCustNames.size());
+		logger.log(Level.INFO, "Invalid Custom Object Names : " + InValidCustNames.toString());
+		logger.log(Level.INFO, "Valid Custom Object Names : " + validCustNames.toString());
+
+		return valid;
+	}
+
+	public static Map<String, Map<DataSecurityObjects, List<Object>>> getOotbObjectMap() {
+		return ootbObjectMap;
+	}
+
+	public static Map<String, Map<DataSecurityObjects, List<Object>>> getCustomObjectMap() {
+		return customObjectMap;
+	}
+
+	public static List<FndObject> getWholeFndObjects() {
+		return wholeFndObjects;
+	}
+
+	public static List<FndGrant> getWholeFndGrants() {
+		return wholeFndGrants;
+	}
+
+	public static List<FndFormFunction> getWholeFndFormFunctions() {
+		return wholeFndFormFunctions;
+	}
+
+	public static List<FndMenu> getWholeFndMenus() {
+		return wholeFndMenus;
+	}
+	
+	
 
 }

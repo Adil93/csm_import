@@ -11,6 +11,8 @@ public class FndGrant {
 
 	@XmlElement(name = "GrantGuid")
 	private String grantGuid;
+	@XmlElement(name = "Name")
+	private String name;
 	@XmlElement(name = "GranteeType")
 	private String granteeType;
 	@XmlElement(name = "ModuleId")
@@ -56,6 +58,14 @@ public class FndGrant {
 
 	public void setGrantGuid(String grantGuid) {
 		this.grantGuid = grantGuid;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getGranteeType() {
