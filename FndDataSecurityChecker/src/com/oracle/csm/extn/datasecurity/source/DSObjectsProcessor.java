@@ -95,7 +95,9 @@ public class DSObjectsProcessor {
 			if (fileName.contains("ZMM/AppCmmnCompNotes/FndGrantsSD.xml")) {
 				zmmAppCompNotesGrants = fndGrants;
 			}
-
+			
+			//want to add here as well
+			
 			for (FndGrant fndGrant : fndGrants) {
 				wholeFndGrants.add(fndGrant);
 
@@ -265,6 +267,14 @@ public class DSObjectsProcessor {
 		}
 		List<String> validCustNames = new ArrayList<String>();
 		List<String> InValidCustNames = new ArrayList<String>();
+		
+		/**
+		 * 
+		 * get the obj name ZMM node grants
+		 * take corresponding from cust obj map - all
+		 * 
+		 */
+		
 		for (Map.Entry<String, Map<DataSecurityObjects, List<Object>>> entry : customObjectMap.entrySet()) {
 			boolean foundRelatedFndGrant = false;
 			boolean foundRelMenuAndIS = false;
@@ -277,9 +287,12 @@ public class DSObjectsProcessor {
 				if (fndGrant.getName().toLowerCase().contains(custObjName.toLowerCase())) {
 
 					foundRelatedFndGrant = true;
+					//check the below var is null or not
 					instanceSetName = fndGrant.getInstanceSetName();
+					// should be there 
 					menuName = fndGrant.getMenuName();
 
+					// 
 					if (instanceSetNameMap.containsKey(instanceSetName) && menuNameMap.containsKey(menuName)) {
 						foundRelMenuAndIS = true;
 						validCustNames.add(custObjName);
