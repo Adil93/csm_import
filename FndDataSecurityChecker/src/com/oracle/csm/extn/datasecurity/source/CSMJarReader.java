@@ -66,7 +66,7 @@ public class CSMJarReader {
 					byte[] byteArray = copyStream(inputStream, nextJarEntry);
 
 					if (byteArray != null) {
-						DSObjectsProcessor.proccessXml(new ByteArrayInputStream(byteArray), name);
+						DataSecurityProccessor.proccessXml(new ByteArrayInputStream(byteArray), name);
 					}
 
 				}

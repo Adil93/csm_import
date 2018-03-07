@@ -12,7 +12,7 @@ import javax.xml.bind.JAXBException;
 
 import com.oracle.csm.extn.datasecurity.model.DataSecurityObjects;
 import com.oracle.csm.extn.datasecurity.source.CSMJarReader;
-import com.oracle.csm.extn.datasecurity.source.DSObjectsProcessor;
+import com.oracle.csm.extn.datasecurity.source.DataSecurityProccessor;
 import com.oracle.csm.extn.datasecurity.utils.ConfigurationReaderUtil;
 import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
 
@@ -40,7 +40,9 @@ public class DSMain {
 			long start = System.currentTimeMillis();
 
 			// Read all the source object
-			String csmJarFilePath = "/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/CS_NEW_DBS_CSM_18082017_V2.jar";
+			
+//			/Volumes/DATA/Adil_Work/pruthvi/datasecurity.jar 
+			String csmJarFilePath = "/Volumes/DATA/Adil_Work/pruthvi/datasecurity.jar" ;//"/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/CS_NEW_DBS_CSM_18082017_V2.jar";
 			logger.log(Level.INFO, "Reading the CSM jar file");
 
 			// Reading and processing the datasecurity XML files
@@ -48,16 +50,19 @@ public class DSMain {
 
 			// Contains Object name as key and all the depended related objects as the value
 			logger.log(Level.INFO, "Proccessing Objects and its related dependent seed datas");
-			DSObjectsProcessor.proccessMaps();
+			DataSecurityProccessor.proccessMaps();
 
-			ootbObjectMap = DSObjectsProcessor.getOotbObjectMap();
-			customObjectMap = DSObjectsProcessor.getCustomObjectMap();
+			ootbObjectMap = DataSecurityProccessor.getOotbObjectMap();
+			customObjectMap = DataSecurityProccessor.getCustomObjectMap();
 
-			if (DSObjectsProcessor.validateSourceData(customObjectMap)) {
+			if (DataSecurityProccessor.validateSourceData(customObjectMap)) {
 				logger.log(Level.INFO, "Source CSM data is Valid");
 			} else {
 				logger.log(Level.INFO, "Source CSM data is Not Valid..!! Please check");
 			}
+			
+//			logger.log(Level.INFO,ootbObjectMap.get("ZMM_NOTES").get(DataSecurityObjects.GRANTS).size());
+			
 
 			logger.log(Level.INFO,
 					"Total time taken for execution " + (System.currentTimeMillis() - start) / 1000 + " seconds");
