@@ -60,6 +60,33 @@ public class FndFormFunction {
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
 	}
+	
+	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((functionName == null) ? 0 : functionName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FndFormFunction other = (FndFormFunction) obj;
+		if (functionName == null) {
+			if (other.functionName != null)
+				return false;
+		} else if (!functionName.equals(other.functionName))
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {

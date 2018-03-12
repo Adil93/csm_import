@@ -71,6 +71,7 @@ public class DataSecurityProccessor {
 					processFNDMenusXML(seedData.getFndMenus(), name);
 			}
 		} catch (JAXBException e) {
+			logger.log(Level.INFO, name);
 			e.printStackTrace();
 		}
 
@@ -300,10 +301,12 @@ public class DataSecurityProccessor {
 					if (!(instanceSetNameMap.containsKey(instanceSetname) && menuNameMap.containsKey(menuName))) {
 
 						customObjectValid = false;
+						break;
 					}
 				} else {
 					if (!menuNameMap.containsKey(menuName)) {
 						customObjectValid = false;
+						break;
 					}
 				}
 			}
@@ -317,10 +320,6 @@ public class DataSecurityProccessor {
 
 		logger.log(Level.INFO, "Validating ZMM_NOTES dependenciess");
 		boolean zmmValid = true;
-
-		// List<Object> fndGrants =
-		// ootbObjectMap.get("ZMM_NOTES").get(DataSecurityObjects.GRANTS);
-
 		List<FndGrant> fndGrants = null;
 
 		if (zmmAppCompNotesGrants != null) {

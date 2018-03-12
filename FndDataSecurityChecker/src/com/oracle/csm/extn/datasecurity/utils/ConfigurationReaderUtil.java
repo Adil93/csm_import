@@ -14,7 +14,7 @@ import java.util.Properties;
 public class ConfigurationReaderUtil {
 
 private static Properties properties = new Properties();
-private static String propFileName = "/Volumes/DATA/Adil_Work/Projects/csm_import_automation/FndDataSecurityChecker/config/config.properties";
+private static String propFileName = "config/config.properties";
 
 
 //Reads configurations from config.properties file.

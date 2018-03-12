@@ -62,6 +62,32 @@ public class FndMenu {
 		this.fndMenuEntries = fndMenuEntries;
 	}
 
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((menuName == null) ? 0 : menuName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FndMenu other = (FndMenu) obj;
+		if (menuName == null) {
+			if (other.menuName != null)
+				return false;
+		} else if (!menuName.equals(other.menuName))
+			return false;
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return "FndMenu [menuName=" + menuName + ", createdBy=" + createdBy + ", lastUpdatedBy=" + lastUpdatedBy
