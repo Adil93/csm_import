@@ -109,6 +109,8 @@ public class TargetValidator {
 
 	}
 
+	// Add entries to corresponding sql files matching the data coming
+	
 	public static <T> void generateSqlQueries(List<T> list, String sqlFilename) {
 
 		try (FileWriter fw = new FileWriter(sqlFilename, true);
@@ -161,7 +163,9 @@ public class TargetValidator {
 
 		return;
 	}
-
+	
+	// Filter the source map with target map data , will return list having data in source which are not in target
+	
 	private static <T> List<T> filterLists(List<T> sourceOotb, List<T> targetOotb) {
 
 		// just not to alter the original list
