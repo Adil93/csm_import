@@ -48,6 +48,8 @@ public class TargetValidator {
 
 		for (String objName : ootbObjectMap.keySet()) {
 
+			//Removing the Source seed datas already present in the target
+			
 			if (ootbObjectMap.get(objName).get(DataSecurityObjects.GRANTS) != null
 					&& targetOootbMap.get(objName).get(DataSecurityObjects.GRANTS) != null)
 				fndGrants = (List<FndGrant>) (List) filterLists(
@@ -71,6 +73,9 @@ public class TargetValidator {
 						ootbObjectMap.get(objName).get(DataSecurityObjects.FORM_FUNCIONS),
 						targetOootbMap.get(objName).get(DataSecurityObjects.FORM_FUNCIONS));
 
+			//Considering only the seed data having created by = SEED_DATA_FROM_APPLICATION
+			// Generating the sql queries corresponding to the data to be create in the target DB 
+			
 			if (fndGrants != null && fndGrants.size() != 0) {
 				fndGrants = fndGrants.stream()
 						.filter(fndGrant -> fndGrant.getCreatedBy().equals("SEED_DATA_FROM_APPLICATION"))
