@@ -71,7 +71,7 @@ public class DSMain {
 			
 			// number of grants  in ZCA_EXP_OBJECTS object
 			int num = ootbObjectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.GRANTS).size();
-			logger.log(Level.INFO, num + "");
+			logger.log(Level.INFO, "Number of grants for ZCA_EXP_OBJECTS : "+num + "");
 
 			logger.log(Level.INFO,
 					"Total time taken for execution " + (System.currentTimeMillis() - start) / 1000 + " seconds");
