@@ -1,29 +1,43 @@
 package com.oracle.csm.extn.datasecurity.domain;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "FndObjectInstanceSets")
+@Entity
+@Table(name = "FND_OBJECT_INSTANCE_SETS")
 public class FndObjectInstanceSet {
 
 	public FndObjectInstanceSet() {
 		// TODO Auto-generated constructor stub
 	}
-	public FndObjectInstanceSet(String instanceSetname) {
-		this.instanceSetName=instanceSetname;
-	}
-	@XmlElement(name = "InstanceSetName")
-	private String instanceSetName;
-	@XmlElement(name = "Predicate")
-	private String predicate;
 
-	@XmlElement(name = "CreatedBy")
+	@Id
+	@Column(name = "instance_set_id")
+	private Long instanceSetId;
+	@Column(name = "instance_set_name")
+	private String instanceSetName;
+	@Column(name = "predicate")
+	private String predicate;
+	@Column(name = "created_by")
 	private String createdBy;
-	@XmlElement(name = "LastUpdatedBy")
+	@Column(name = "last_updated_by")
 	private String lastUpdatedBy;
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "object_id")
+	private FndObject fndObj;
+
+	public Long getInstanceSetId() {
+		return instanceSetId;
+	}
+
+	public void setInstanceSetId(Long instanceSetId) {
+		this.instanceSetId = instanceSetId;
+	}
 
 	public String getInstanceSetName() {
 		return instanceSetName;
@@ -57,10 +71,12 @@ public class FndObjectInstanceSet {
 		this.lastUpdatedBy = lastUpdatedBy;
 	}
 
-	@Override
-	public String toString() {
-		return "FndObjectInstanceSet [instanceSetName=" + instanceSetName + ", predicate=" + predicate + ", createdBy="
-				+ createdBy + ", lastUpdatedBy=" + lastUpdatedBy + "]";
+	public FndObject getFndObj() {
+		return fndObj;
+	}
+
+	public void setFndObj(FndObject fndObject) {
+		this.fndObj = fndObject;
 	}
 
 }

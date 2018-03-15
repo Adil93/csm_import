@@ -121,6 +121,7 @@ public class FndGrant {
 		if (getClass() != obj.getClass())
 			return false;
 		FndGrant other = (FndGrant) obj;
+		
 		if (grantGuid == null) {
 			if (other.grantGuid != null)
 				return false;

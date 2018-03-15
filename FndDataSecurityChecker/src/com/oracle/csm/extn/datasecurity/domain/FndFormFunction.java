@@ -1,25 +1,67 @@
 package com.oracle.csm.extn.datasecurity.domain;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "FndFormFunctions")
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+@Entity
+@Table(name = "FND_FORM_FUNCTIONS")
 public class FndFormFunction {
 
-	@XmlElement(name = "FunctionName")
+	@Id
+    @Column(name="function_id")
+	private Long functionId;
+	
+    @Column(name="function_name")
 	private String functionName;
-	@XmlElement(name = "FndObjects1.ObjName")
-	private String objectName;
-	@XmlElement(name = "ModuleId")
+    
+    @ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="object_id")
+	private FndObject fndObject;
+    
+	@Column(name="module_id")
 	private String moduleId;
-
-	@XmlElement(name = "CreatedBy")
+    
+	@Column(name="created_by")
 	private String createdBy;
-	@XmlElement(name = "LastUpdatedBy")
+    
+	@Column(name="last_updated_by")
 	private String lastUpdatedBy;
+   
+	public Long getFunctionId() {
+		return functionId;
+	}
+
+	public void setFunctionId(Long functionId) {
+		this.functionId = functionId;
+	}
+
+	public String getFunctionName() {
+		return functionName;
+	}
+
+	public void setFunctionName(String functionName) {
+		this.functionName = functionName;
+	}
+
+	public FndObject getFndObject() {
+		return fndObject;
+	}
+
+	public void setFndObject(FndObject fndObject) {
+		this.fndObject = fndObject;
+	}
+
+	public String getModuleId() {
+		return moduleId;
+	}
+
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
+	}
 
 	public String getCreatedBy() {
 		return createdBy;
@@ -37,33 +79,4 @@ public class FndFormFunction {
 		this.lastUpdatedBy = lastUpdatedBy;
 	}
 
-	public String getFunctionName() {
-		return functionName;
-	}
-
-	public void setFunctionName(String functionName) {
-		this.functionName = functionName;
-	}
-
-	public String getObjectName() {
-		return objectName;
-	}
-
-	public void setObjectName(String objectName) {
-		this.objectName = objectName;
-	}
-
-	public String getModuleId() {
-		return moduleId;
-	}
-
-	public void setModuleId(String moduleId) {
-		this.moduleId = moduleId;
-	}
-
-	@Override
-	public String toString() {
-		return "FndFormFunction [functionName=" + functionName + ", objectName=" + objectName + ", moduleId=" + moduleId
-				+ ", createdBy=" + createdBy + ", lastUpdatedBy=" + lastUpdatedBy + "]";
-	}
 }

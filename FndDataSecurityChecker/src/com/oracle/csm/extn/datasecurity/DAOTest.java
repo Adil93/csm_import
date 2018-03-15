@@ -62,10 +62,12 @@ public class DAOTest {
 		FndGrant fndGrant = new FndGrant();
 		fndGrant.setName("Grant001");
 		fndGrant.setCreatedBy("SEED_DATA_FROM_APPLICATION");
+		fndGrant.setGrantGuid("123");
 
 		FndGrant fndGrant1 = new FndGrant();
 		fndGrant1.setName("Grant002");
 		fndGrant1.setCreatedBy("SEED_DATA_FROM_APPLICATION");
+		fndGrant1.setGrantGuid("222");
 
 		FndGrant fndGrant2 = new FndGrant();
 		fndGrant2.setName("Grant003");
@@ -136,7 +138,34 @@ public class DAOTest {
 		targetMap.put("abc",targetObjectMap );
 		
 		
-		TargetValidator.validate(sourceMap, targetMap);
+//		TargetValidator.validate(sourceMap, targetMap);
+		
+		
+		List<com.oracle.csm.extn.datasecurity.domain.FndGrant> targetfndGrants = new ArrayList<>();
+		com.oracle.csm.extn.datasecurity.domain.FndGrant targetFndGrant = new com.oracle.csm.extn.datasecurity.domain.FndGrant();
+		targetFndGrant.setGrantGuid("123");
+		targetFndGrant.setCreatedBy("SEED_DATA_FROM_APPLICATION");
+		com.oracle.csm.extn.datasecurity.domain.FndGrant targetFndGrant1 = new com.oracle.csm.extn.datasecurity.domain.FndGrant();
+		targetFndGrant1.setGrantGuid("222");
+		targetFndGrant1.setCreatedBy("SEED_DATA_FROM_APPLICATION");
+		
+		
+		targetfndGrants.add(targetFndGrant);
+		targetfndGrants.add(targetFndGrant1);
+		
+		List<Object> srcList=new ArrayList<>();
+		List<Object> trgList=new ArrayList<>();
+		
+		for(FndGrant fndGrant4: fndGrants)
+			srcList.add(fndGrant4);
+		
+		for(com.oracle.csm.extn.datasecurity.domain.FndGrant trgGrant :targetfndGrants ) {
+			trgList.add(trgGrant);
+		}
+		
+		List<FndGrant> result = (List<FndGrant>)(List)TargetValidator.filterLists(srcList, trgList, DataSecurityObjects.GRANTS);
+		
+		System.out.println("complete tesing");
 
 	}
 }

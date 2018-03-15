@@ -1,40 +1,40 @@
 package com.oracle.csm.extn.datasecurity.domain;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "FND_GRANTS")
 public class FndGrant {
 
+	@Id
+	@Column(name = "grant_guid")
 	private String grantGuid;
+
+	@Column(name = "grantee_type")
 	private String granteeType;
+
+	@Column(name = "module_id")
 	private String moduleId;
-	private String objName;
-	private String instanceSetName;
-	private String menuName;
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "object_id")
+	private FndObject fndObj;
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "menu_id")
+	private FndMenu fndMenu;
+
+	@Column(name = "created_by")
 	private String createdBy;
+
+	@Column(name = "last_updated_by")
 	private String lastUpdatedBy;
-
-	public String getObjName() {
-		return objName;
-	}
-
-	public void setObjName(String objName) {
-		this.objName = objName;
-	}
-
-	public String getInstanceSetName() {
-		return instanceSetName;
-	}
-
-	public void setInstanceSetName(String instanceSetName) {
-		this.instanceSetName = instanceSetName;
-	}
-
-	public String getMenuName() {
-		return menuName;
-	}
-
-	public void setMenuName(String menuName) {
-		this.menuName = menuName;
-	}
 
 	public String getGrantGuid() {
 		return grantGuid;
@@ -60,6 +60,22 @@ public class FndGrant {
 		this.moduleId = moduleId;
 	}
 
+	public FndObject getFndObj() {
+		return fndObj;
+	}
+
+	public void setFndObj(FndObject fndObj) {
+		this.fndObj = fndObj;
+	}
+
+	public FndMenu getFndMenu() {
+		return fndMenu;
+	}
+
+	public void setFndMenu(FndMenu fndMenu) {
+		this.fndMenu = fndMenu;
+	}
+
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -75,7 +91,5 @@ public class FndGrant {
 	public void setLastUpdatedBy(String lastUpdatedBy) {
 		this.lastUpdatedBy = lastUpdatedBy;
 	}
-
-
 
 }

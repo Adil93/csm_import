@@ -1,8 +1,6 @@
 package com.oracle.csm.extn.datasecurity.domain;
 
 import java.io.Serializable;
-//import java.math.BigInteger;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,11 +10,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "FND_OBJECTS")
 public class FndObject implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	public FndObject(){
 		
 	}
@@ -29,7 +22,6 @@ public class FndObject implements Serializable{
 		this.createdBy = createdBy;
 		this.lastUpdatedBy = lastUpdatedBy;
 	}
-
 
 	@Id
     @Column(name="object_id")
