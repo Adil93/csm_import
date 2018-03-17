@@ -48,9 +48,12 @@ public class DSMain {
 		try {
 			long start = System.currentTimeMillis();
 
+			String testObjName ="SVC_SERVICE_REQUESTS"; //"ZSF_FCST_ITEM_DETAIL";
+			
+//			ZSF_FCST_ITEM_DETAIL
 			// Testing purpose
 
-			ootbSourceObjectMap_test.put("SVC_SERVICE_REQUESTS", null);
+			ootbSourceObjectMap_test.put(testObjName, null);
 
 			String csmJarFilePath = "/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/14_03_2018/datasecurity.jar";
 
@@ -77,26 +80,16 @@ public class DSMain {
 				// need to throw an exception
 			}
 
-			// Read all the target objects
-			// Map<String, FndObject> targetFndObjMap;
-			// extracting the
-
 			ootbTargetObjectMap = DSObjectsTargetProcessor.extractFndObjects(ootbSourceObjectMap_test);
 
-			// System.out.println("Objects Found in target are : ");
-			// for(Map.Entry<String, Map<DataSecurityObjects, List<Object>>> entry :
-			// ootbTargetObjectMap.entrySet()) {
-			// System.out.println(entry.getKey());
-			// }
-
+			logger.log(Level.INFO, "Target OOTB object Size : " + ootbTargetObjectMap.keySet().size());
+			
 			// Compare Source and target data and create insert queries to rectify target
-			// side
-
 			TargetValidator.validate(ootbSourceObjectMap, ootbTargetObjectMap);
 
 			// number of grants in ZCA_EXP_OBJECTS object
-			int num = ootbSourceObjectMap.get("ZCA_EXP_OBJECTS").get(DataSecurityObjects.GRANTS).size();
-			logger.log(Level.INFO, "Number of grants for ZCA_EXP_OBJECTS : " + num + "");
+			int num = ootbSourceObjectMap.get(testObjName).get(DataSecurityObjects.GRANTS).size();
+			logger.log(Level.INFO, "Number of grants for " + testObjName + ": " + num);
 
 			logger.log(Level.INFO,
 					"Total time taken for execution " + (System.currentTimeMillis() - start) / 1000 + " seconds");

@@ -13,13 +13,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import com.oracle.csm.extn.datasecurity.model.FndFormFunction;
 import com.oracle.csm.extn.datasecurity.model.DataSecurityObjects;
+import com.oracle.csm.extn.datasecurity.model.FndFormFunction;
 import com.oracle.csm.extn.datasecurity.model.FndGrant;
 import com.oracle.csm.extn.datasecurity.model.FndMenu;
 import com.oracle.csm.extn.datasecurity.model.FndObjectInstanceSet;
 import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
-import com.sun.media.jfxmedia.logging.Logger;
 
 /**
  * 
@@ -44,13 +43,10 @@ public class TargetValidator {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void validate(Map<String, Map<DataSecurityObjects, List<Object>>> ootbObjectMap,
-
 			Map<String, Map<DataSecurityObjects, List<Object>>> targetOootbMap) {
 
-		// Need to change the target models to target domain.<>
-		
-		
-
+		long start = System.currentTimeMillis();
+		// Truncating existing file contents
 
 		try {
 			Files.newBufferedWriter(Paths.get(fndGrantSqlfile), StandardOpenOption.TRUNCATE_EXISTING);
@@ -69,21 +65,14 @@ public class TargetValidator {
 		List<FndMenu> fndMenus = null;
 		List<FndFormFunction> fndFormFunctions = null;
 
-		List<FndGrant> targetGndGrants = null;
-		List<FndObjectInstanceSet> targetInstacneSets = null;
-		List<FndMenu> targetFndMenus = null;
-		List<FndFormFunction> targetFndFormFunctions = null;
-		
-		
-		
-		
 		for (String objName : ootbObjectMap.keySet()) {
 
 			// Removing the Source seed data already present in the target
 			if (targetOootbMap.containsKey(objName)) {
-				
-				com.oracle.csm.extn.datasecurity.domain.FndGrant fndObjNameID= (com.oracle.csm.extn.datasecurity.domain.FndGrant) targetOootbMap.get(objName).get(DataSecurityObjects.GRANTS).get(0);
-				String  objId= fndObjNameID.getFndObj().getObjectId().toString();
+
+				com.oracle.csm.extn.datasecurity.domain.FndGrant fndObjNameID = (com.oracle.csm.extn.datasecurity.domain.FndGrant) targetOootbMap
+						.get(objName).get(DataSecurityObjects.GRANTS).get(0);
+				String objId = fndObjNameID.getFndObj().getObjectId().toString();
 
 				if (ootbObjectMap.get(objName).get(DataSecurityObjects.GRANTS) != null
 						&& targetOootbMap.get(objName).get(DataSecurityObjects.GRANTS) != null)
@@ -122,7 +111,7 @@ public class TargetValidator {
 							.collect(Collectors.toList());
 					// need to give a check
 					if (fndGrants != null && fndGrants.size() != 0)
-						generateSqlQueries(fndGrants, fndGrantSqlfile,objId);
+						generateSqlQueries(fndGrants, fndGrantSqlfile, objId);
 				}
 
 				if (instacneSets != null && instacneSets.size() != 0) {
@@ -131,32 +120,31 @@ public class TargetValidator {
 							.filter(instanceSet -> "SEED_DATA_FROM_APPLICATION".equals(instanceSet.getCreatedBy()))
 							.collect(Collectors.toList());
 					if (instacneSets != null && instacneSets.size() != 0)
-						generateSqlQueries(instacneSets, fndInstanceSetsSqlfile,objId);
+						generateSqlQueries(instacneSets, fndInstanceSetsSqlfile, objId);
 				}
 
-				 if (fndMenus != null && fndMenus.size() != 0) {
-				
-				 // Need to give a null check for createdBy
-				 fndMenus = fndMenus.stream()
-				 .filter(fndMenu ->
-				 			
-						 "SEED_DATA_FROM_APPLICATION".equals(fndMenu.getCreatedBy()))
-				 .collect(Collectors.toList());
-				 if (fndMenus != null && fndMenus.size() != 0)
-				 generateSqlQueries(fndMenus, fndMenusSqlfile,objId);
-				 }
+				if (fndMenus != null && fndMenus.size() != 0) {
+
+					// Need to give a null check for createdBy
+					fndMenus = fndMenus.stream().filter(fndMenu ->
+
+					"SEED_DATA_FROM_APPLICATION".equals(fndMenu.getCreatedBy())).collect(Collectors.toList());
+					if (fndMenus != null && fndMenus.size() != 0)
+						generateSqlQueries(fndMenus, fndMenusSqlfile, objId);
+				}
 
 				if (fndFormFunctions != null && fndFormFunctions.size() != 0) {
 					fndFormFunctions = fndFormFunctions.stream().filter(
 							fndFormFunction -> "SEED_DATA_FROM_APPLICATION".equals(fndFormFunction.getCreatedBy()))
 							.collect(Collectors.toList());
 					if (fndFormFunctions != null && fndFormFunctions.size() != 0)
-						generateSqlQueries(fndFormFunctions, fndFormFunctionSqlfile,objId);
+						generateSqlQueries(fndFormFunctions, fndFormFunctionSqlfile, objId);
 				}
 			}
 
 		}
-
+		logger.log(Level.INFO,
+				"Total time taken for validation " + (System.currentTimeMillis() - start) + " milli seconds");
 	}
 
 	// Add entries to corresponding sql files matching the data coming
@@ -193,7 +181,7 @@ public class TargetValidator {
 
 					out.println(String.format(
 							"INSERT into FND_FORM_FUNCTIONS (FUNCTION_NAME,CREATED_BY,OBJECT_ID) VALUES (\"%s\",\"%s\");",
-							formFunction.getFunctionName(), formFunction.getCreatedBy(),objId));
+							formFunction.getFunctionName(), formFunction.getCreatedBy(), objId));
 				}
 
 			} else if (list.get(0) instanceof FndMenu) {
@@ -224,6 +212,7 @@ public class TargetValidator {
 		// sourceDuplicate.removeAll(targetOotb);
 
 		switch (datasecurityObject) {
+		
 		case GRANTS:
 			List<FndGrant> sourceFndGrants = new ArrayList<>();
 			for (Object obj : sourceOotb) {
@@ -247,6 +236,7 @@ public class TargetValidator {
 				}
 			}
 			break;
+			
 		case INSTANCE_SETS:
 			List<FndObjectInstanceSet> sourceFndObjectInstacneSets = new ArrayList<>();
 			for (Object obj : sourceOotb) {
@@ -260,17 +250,19 @@ public class TargetValidator {
 			for (FndObjectInstanceSet sourceInstanceSet : sourceFndObjectInstacneSets) {
 				boolean found = false;
 				for (com.oracle.csm.extn.datasecurity.domain.FndObjectInstanceSet targetInstacneSet : targetFndObjectInstacneSets) {
-					if(targetInstacneSet !=null)
-					if (sourceInstanceSet.getInstanceSetName().equals(targetInstacneSet.getInstanceSetName())) {
-						found = true;
-						break;
-					}
+					if (targetInstacneSet != null)
+						if (sourceInstanceSet.getInstanceSetName().equals(targetInstacneSet.getInstanceSetName())) {
+							found = true;
+							break;
+						}
 				}
 				if (!found) {
-					pendingInSource.add(sourceInstanceSet);
+					if (!"".equals(sourceInstanceSet.getInstanceSetName()))
+						pendingInSource.add(sourceInstanceSet);
 				}
 			}
 			break;
+			
 		case MENUS:
 			List<FndMenu> sourceFndMenus = new ArrayList<>();
 			for (Object obj : sourceOotb) {
@@ -294,6 +286,7 @@ public class TargetValidator {
 				}
 			}
 			break;
+			
 		case FORM_FUNCIONS:
 			List<com.oracle.csm.extn.datasecurity.model.FndFormFunction> sourceFndFormFunctions = new ArrayList<>();
 			for (Object obj : sourceOotb) {
