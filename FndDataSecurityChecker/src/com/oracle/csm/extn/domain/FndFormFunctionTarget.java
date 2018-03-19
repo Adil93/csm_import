@@ -1,4 +1,4 @@
-package com.oracle.csm.extn.datasecurity.domain;
+package com.oracle.csm.extn.domain;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 @Entity
 @Table(name = "FND_FORM_FUNCTIONS")
-public class FndFormFunction {
+public class FndFormFunctionTarget {
 
 	@Id
     @Column(name="function_id")
@@ -20,7 +20,7 @@ public class FndFormFunction {
     
     @ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="object_id")
-	private FndObject fndObject;
+	private FndObjectTarget fndObject;
     
 	@Column(name="module_id")
 	private String moduleId;
@@ -47,11 +47,11 @@ public class FndFormFunction {
 		this.functionName = functionName;
 	}
 
-	public FndObject getFndObject() {
+	public FndObjectTarget getFndObject() {
 		return fndObject;
 	}
 
-	public void setFndObject(FndObject fndObject) {
+	public void setFndObject(FndObjectTarget fndObject) {
 		this.fndObject = fndObject;
 	}
 

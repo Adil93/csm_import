@@ -1,4 +1,4 @@
-package com.oracle.csm.extn.datasecurity.domain;
+package com.oracle.csm.extn.domain;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,7 +10,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "FND_GRANTS")
-public class FndGrant {
+public class FndGrantTarget {
+    
 
 	@Id
 	@Column(name = "grant_guid")
@@ -24,11 +25,11 @@ public class FndGrant {
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "object_id")
-	private FndObject fndObj;
+	private FndObjectTarget fndObj;
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "menu_id")
-	private FndMenu fndMenu;
+	private FndMenuTarget fndMenu;
 
 	@Column(name = "created_by")
 	private String createdBy;
@@ -60,19 +61,19 @@ public class FndGrant {
 		this.moduleId = moduleId;
 	}
 
-	public FndObject getFndObj() {
+	public FndObjectTarget getFndObj() {
 		return fndObj;
 	}
 
-	public void setFndObj(FndObject fndObj) {
+	public void setFndObj(FndObjectTarget fndObj) {
 		this.fndObj = fndObj;
 	}
 
-	public FndMenu getFndMenu() {
+	public FndMenuTarget getFndMenu() {
 		return fndMenu;
 	}
 
-	public void setFndMenu(FndMenu fndMenu) {
+	public void setFndMenu(FndMenuTarget fndMenu) {
 		this.fndMenu = fndMenu;
 	}
 
@@ -91,5 +92,6 @@ public class FndGrant {
 	public void setLastUpdatedBy(String lastUpdatedBy) {
 		this.lastUpdatedBy = lastUpdatedBy;
 	}
+
 
 }

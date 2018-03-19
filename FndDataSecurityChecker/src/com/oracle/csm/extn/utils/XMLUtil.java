@@ -1,4 +1,4 @@
-package com.oracle.csm.extn.datasecurity.utils;
+package com.oracle.csm.extn.utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;

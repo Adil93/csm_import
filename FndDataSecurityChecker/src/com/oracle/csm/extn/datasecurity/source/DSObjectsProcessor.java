@@ -3,13 +3,10 @@ package com.oracle.csm.extn.datasecurity.source;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -29,7 +26,7 @@ import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
  * @author adilmuthukoya
  *
  */
-public class DataSecurityProccessor {
+public class DSObjectsProcessor {
 
 	private static Logger logger = DSLoggerUtil.getLogger();
 
@@ -46,7 +43,7 @@ public class DataSecurityProccessor {
 	private static Map<String, FndObject> objectNameMap = new HashMap<String, FndObject>();
 	private static Map<String, FndObjectInstanceSet> instanceSetNameMap = new HashMap<String, FndObjectInstanceSet>();
 
-	public DataSecurityProccessor() {
+	public DSObjectsProcessor() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -73,7 +70,6 @@ public class DataSecurityProccessor {
 					processFNDMenusXML(seedData.getFndMenus(), name);
 			}
 		} catch (JAXBException e) {
-			logger.log(Level.INFO, name);
 			e.printStackTrace();
 		}
 
@@ -99,9 +95,9 @@ public class DataSecurityProccessor {
 			if (fileName.contains("ZMM/AppCmmnCompNotes/FndGrantsSD.xml")) {
 				zmmAppCompNotesGrants = fndGrants;
 			}
-
-			// want to add here as well
-
+			
+			//want to add here as well
+			
 			for (FndGrant fndGrant : fndGrants) {
 				wholeFndGrants.add(fndGrant);
 
@@ -168,18 +164,17 @@ public class DataSecurityProccessor {
 				if (objectMap.containsKey(objName)) {
 					objectMap.get(objName).get(DataSecurityObjects.GRANTS).add(fndGrant);
 
-					if (fndGrant.getMenuName() != null && !"".equals(fndGrant.getMenuName())) {
+					if (fndGrant.getMenuName() != null) {
 						if (menuNameMap.get(fndGrant.getMenuName()) != null)
 							objectMap.get(objName).get(DataSecurityObjects.MENUS)
 									.add(menuNameMap.get(fndGrant.getMenuName()));
 						else {
 							FndMenu fndMenu = new FndMenu(fndGrant.getMenuName());
-							fndMenu.setCreatedBy("SEED_DATA_FROM_APPLICATION");
 							objectMap.get(objName).get(DataSecurityObjects.MENUS).add(fndMenu);
 						}
 					}
 
-					if (fndGrant.getInstanceSetName() != null && !"".equals(fndGrant.getInstanceSetName())) {
+					if (fndGrant.getInstanceSetName() != null) {
 						boolean found = false;
 
 						if (objectNameMap.containsKey(objName) && objectNameMap.get(objName) != null) {
@@ -199,7 +194,6 @@ public class DataSecurityProccessor {
 						if (!found) {
 							FndObjectInstanceSet fndObjectInstanceSet = new FndObjectInstanceSet(
 									fndGrant.getInstanceSetName());
-							fndObjectInstanceSet.setCreatedBy("SEED_DATA_FROM_APPLICATION");
 							objectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS).add(fndObjectInstanceSet);
 						}
 
@@ -257,115 +251,30 @@ public class DataSecurityProccessor {
 	public static boolean validateSourceData(Map<String, Map<DataSecurityObjects, List<Object>>> customObjectMap) {
 		// Write logics for Source data validations
 		logger.log(Level.INFO, "Validating Source CSM data........[Mainly Custom Object validation]");
-
-		// Make two separate threads and run zmmNotesValidation and custom validation in
-		// parallel
-		// Check whether we need to use Executer service to do it here
-
-		final boolean[] result = new boolean[2];
-
-		 Thread zmmThread = new Thread(() -> {
-		 result[0] = zmmNotesValidation();
 		
-		 }, "ZMMNOTES_THREAD");
+		boolean valid = true;
 		
-		 Thread customObjectThread = new Thread(() -> {
-		 result[1] = customObjectValidation();
-		 }, "CUSTOM_OBJECTS_THREAD");
+		// Number of other validations to be added
+		// Just added ZMM_NOTES object dependency with custom object
+		// List<Object> fndGrants = ootbObjectMap.get("ZMM_NOTES").get(DataSecurityObjects.GRANTS);
 		
-		 zmmThread.start();
-		 customObjectThread.start();
-		
-		 try {
-		 zmmThread.join();
-		 customObjectThread.join();
-		 } catch (InterruptedException e) {
-		 e.printStackTrace();
-		 }
-
-//		result[0] = zmmNotesValidation();
-//		result[1] = customObjectValidation();
-		return result[0] && result[1];
-
-	}
-
-	private static boolean customObjectValidation() {
-		// to be changed
-		logger.log(Level.INFO, "Validating CustomObjects instacne set and menu dependencies");
-
-		boolean customObjectValid = true;
-
-		Set<String> validGrantNames = new HashSet<String>();
-		Set<String> invalidGrantNames = new HashSet<String>();
-
 		List<FndGrant> fndGrants = null;
-
-		int objCount = customObjectMap.keySet().size();
-		logger.log(Level.INFO, "Total number of custom Objects : " + objCount);
-
-		for (Map.Entry<String, Map<DataSecurityObjects, List<Object>>> entry : customObjectMap.entrySet()) {
-
-			int grantSize = entry.getValue().get(DataSecurityObjects.GRANTS).size();
-
-			logger.log(Level.FINE, "Object : " + entry.getKey() + " has " + grantSize + " grants");
-
-			fndGrants = entry.getValue().get(DataSecurityObjects.GRANTS).stream().map(obj -> (FndGrant) obj)
-					.collect(Collectors.toList());
-
-			// put a warning here instead of considering as invalid 
-			
-			for (FndGrant fndGrant : fndGrants) {
-
-				String instanceSetName = fndGrant.getInstanceSetName();
-				String menuName = fndGrant.getMenuName();
-
-				if (instanceSetName != null && !instanceSetName.equals("")) {
-					if (!(instanceSetNameMap.containsKey(instanceSetName) && menuNameMap.containsKey(menuName))) {
-
-						customObjectValid = false;
-						// break;
-						invalidGrantNames.add(fndGrant.getGrantGuid());
-					} else {
-						validGrantNames.add(fndGrant.getGrantGuid());
-					}
-				} else {
-					if (!menuNameMap.containsKey(menuName)) {
-						customObjectValid = false;
-						// break;
-						invalidGrantNames.add(fndGrant.getGrantGuid());
-					} else {
-						validGrantNames.add(fndGrant.getGrantGuid());
-					}
-				}
-			}
-
-		}
-		logger.log(Level.INFO, "Invalid Grant Object size : " + invalidGrantNames.size());
-		logger.log(Level.INFO, "valid Grant Object size : " + validGrantNames.size());
-		logger.log(Level.INFO,
-				"Invalid Grant Object Names [Cutom Object Validation] : " + invalidGrantNames.toString());
-		// logger.log(Level.INFO, "Valid Grant Object Names [Custom Object Validation] :
-		// " + validGrantNames.toString());
-
-		return customObjectValid;
-	}
-
-	private static boolean zmmNotesValidation() {
-
-		logger.log(Level.INFO, "Validating ZMM_NOTES dependenciess");
-		boolean zmmValid = true;
-		List<FndGrant> fndGrants = null;
-
 		if (zmmAppCompNotesGrants != null) {
 			fndGrants = zmmAppCompNotesGrants;
 		} else {
 			logger.log(Level.INFO, "No ZMM/AppCmmnCompNotes/FndGrantsSD.xml exists");
 			return false;
 		}
-
-		Set<String> validCustNames = new HashSet<String>();
-		Set<String> InValidCustNames = new HashSet<String>();
-
+		List<String> validCustNames = new ArrayList<String>();
+		List<String> InValidCustNames = new ArrayList<String>();
+		
+		/**
+		 * 
+		 * get the obj name ZMM node grants
+		 * take corresponding from cust obj map - all
+		 * 
+		 */
+		
 		for (Map.Entry<String, Map<DataSecurityObjects, List<Object>>> entry : customObjectMap.entrySet()) {
 			boolean foundRelatedFndGrant = false;
 			boolean foundRelMenuAndIS = false;
@@ -378,42 +287,37 @@ public class DataSecurityProccessor {
 				if (fndGrant.getName().toLowerCase().contains(custObjName.toLowerCase())) {
 
 					foundRelatedFndGrant = true;
-
+					//check the below var is null or not
 					instanceSetName = fndGrant.getInstanceSetName();
+					// should be there 
 					menuName = fndGrant.getMenuName();
 
-					if (instanceSetName != null && !instanceSetName.equals("")) {
-						if (instanceSetNameMap.containsKey(instanceSetName) && menuNameMap.containsKey(menuName)) {
-							foundRelMenuAndIS = true;
-							// validCustNames.add(custObjName);
-						}
-					} else {
-						if (menuNameMap.containsKey(menuName)) {
-							foundRelMenuAndIS = true;
-							// validCustNames.add(custObjName);
-						}
+					// 
+					if (instanceSetNameMap.containsKey(instanceSetName) && menuNameMap.containsKey(menuName)) {
+						foundRelMenuAndIS = true;
+						validCustNames.add(custObjName);
 					}
 
 					break;
+
 				}
+
 			}
 
 			if (!(foundRelatedFndGrant && foundRelMenuAndIS)) {
 				// return false;
 				InValidCustNames.add(custObjName);
-				zmmValid = false;
+				valid = false;
 
-			} else {
-				validCustNames.add(custObjName);
 			}
 
 		}
 		logger.log(Level.INFO, "Invalid Custom Object size : " + InValidCustNames.size());
 		logger.log(Level.INFO, "valid Custom Object size : " + validCustNames.size());
-		logger.log(Level.INFO, "Invalid Custom Object Names [ZMM Validation] : " + InValidCustNames.toString());
-		logger.log(Level.INFO, "Valid Custom Object Names [ZMM Validation]  : " + validCustNames.toString());
+		logger.log(Level.INFO, "Invalid Custom Object Names : " + InValidCustNames.toString());
+		logger.log(Level.INFO, "Valid Custom Object Names : " + validCustNames.toString());
 
-		return zmmValid;
+		return valid;
 	}
 
 	public static Map<String, Map<DataSecurityObjects, List<Object>>> getOotbObjectMap() {
@@ -439,5 +343,7 @@ public class DataSecurityProccessor {
 	public static List<FndMenu> getWholeFndMenus() {
 		return wholeFndMenus;
 	}
+	
+	
 
 }

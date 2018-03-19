@@ -17,11 +17,11 @@ public class XmlToObject {
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			
 			List<FndGrant> fndGrants = new ArrayList<FndGrant>();
-//			fndGrants = (ArrayList<FndGrant>)unmarshaller.unmarshal(new File("/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/20_12_2017/FndGrantsSD.xml"));
+//			fndGrants = (ArrayList<FndGrantTarget>)unmarshaller.unmarshal(new File("/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/20_12_2017/FndGrantsSD.xml"));
 			
 //			System.out.println(fndGrants.get(0).getGrantGuid());
 			
-//			FndGrant obj = (FndGrant) unmarshaller.unmarshal(new File("/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/20_12_2017/FndGrantsSD.xml"));
+//			FndGrantTarget obj = (FndGrantTarget) unmarshaller.unmarshal(new File("/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/20_12_2017/FndGrantsSD.xml"));
 			
 			SeedData seedData = (SeedData) unmarshaller.unmarshal(new File("/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/20_12_2017/FndGrantsSD.xml"));
 			

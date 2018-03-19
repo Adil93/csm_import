@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
+import javax.swing.text.StyledEditorKit.ForegroundAction;
+
 /**
 * @author adilmuthukoya
 * Reads configuration from config/config.properties

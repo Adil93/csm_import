@@ -1,4 +1,4 @@
-package com.oracle.csm.extn.datasecurity.domain;
+package com.oracle.csm.extn.domain;
 
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -9,12 +9,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "FND_OBJECTS")
-public class FndObject implements Serializable{
-	public FndObject(){
+public class FndObjectTarget implements Serializable{
+	public FndObjectTarget(){
 		
 	}
 	
-	public FndObject(Long objectId, String objName, String moduleId, String createdBy, String lastUpdatedBy) {
+	public FndObjectTarget(Long objectId, String objName, String moduleId, String createdBy, String lastUpdatedBy) {
 		super();
 		this.objectId = objectId;
 		this.objName = objName;

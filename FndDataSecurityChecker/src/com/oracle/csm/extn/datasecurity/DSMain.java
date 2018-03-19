@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import com.oracle.csm.extn.datasecurity.domain.FndObject;
+//import com.oracle.csm.extn.datasecurity.domain.FndObject;
 import com.oracle.csm.extn.datasecurity.model.DataSecurityObjects;
 import com.oracle.csm.extn.datasecurity.source.CSMJarReader;
 import com.oracle.csm.extn.datasecurity.source.DataSecurityProccessor;
@@ -32,13 +32,11 @@ public class DSMain {
 	}
 
 	private static Map<String, Map<DataSecurityObjects, List<Object>>> ootbSourceObjectMap;
-
 	private static Map<String, Map<DataSecurityObjects, List<Object>>> ootbSourceObjectMap_test = new HashMap<>();
-
 	private static Map<String, Map<DataSecurityObjects, List<Object>>> customObjectSourceMap;
 	private static Logger logger = DSLoggerUtil.getLogger();
 	private static Map<String, Map<DataSecurityObjects, List<Object>>> ootbTargetObjectMap;
-	private static Map<String, FndObject> targetFndObj;
+//	private static Map<String, FndObject> targetFndObj;
 
 	/**
 	 * @param args
@@ -48,12 +46,21 @@ public class DSMain {
 		try {
 			long start = System.currentTimeMillis();
 
-			String testObjName ="SVC_SERVICE_REQUESTS"; //"ZSF_FCST_ITEM_DETAIL";
+			String testObjName = "ZSF_FCST_ITEM_DETAIL"; // "SVC_SERVICE_REQUESTS"
+			String testObjName1 = "ZCA_REF_ENTITIES";
+			String testObjName2 = "MOT_REF_ENTITIES";
+			String testObjName3 = "ZBS_REFERENCE_PROFILES_XM";
 			
-//			ZSF_FCST_ITEM_DETAIL
+
+			// ZSF_FCST_ITEM_DETAIL
 			// Testing purpose
 
 			ootbSourceObjectMap_test.put(testObjName, null);
+			ootbSourceObjectMap_test.put(testObjName1, null);
+			ootbSourceObjectMap_test.put(testObjName2, null);
+			ootbSourceObjectMap_test.put(testObjName3, null);
+
+			
 
 			String csmJarFilePath = "/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/14_03_2018/datasecurity.jar";
 
@@ -65,6 +72,9 @@ public class DSMain {
 
 			logger.log(Level.INFO, "Proccessing Objects and its related dependent seed datas");
 			DataSecurityProccessor.proccessMaps();
+
+			logger.log(Level.INFO, "Total time taken for reading / proccessing the entire CSM : "
+					+ (System.currentTimeMillis() - start) / 1000 + " seconds");
 
 			// Contains Object name as key and all the depended related objects as the value
 			ootbSourceObjectMap = DataSecurityProccessor.getOotbObjectMap();
@@ -83,7 +93,7 @@ public class DSMain {
 			ootbTargetObjectMap = DSObjectsTargetProcessor.extractFndObjects(ootbSourceObjectMap_test);
 
 			logger.log(Level.INFO, "Target OOTB object Size : " + ootbTargetObjectMap.keySet().size());
-			
+
 			// Compare Source and target data and create insert queries to rectify target
 			TargetValidator.validate(ootbSourceObjectMap, ootbTargetObjectMap);
 

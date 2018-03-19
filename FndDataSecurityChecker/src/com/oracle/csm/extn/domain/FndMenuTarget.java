@@ -1,4 +1,4 @@
-package com.oracle.csm.extn.datasecurity.domain;
+package com.oracle.csm.extn.domain;
 
 
 import java.io.Serializable;
@@ -19,13 +19,13 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "FND_MENUS")
-public class FndMenu implements Serializable{
+public class FndMenuTarget implements Serializable{
 
-	public FndMenu() {
+	public FndMenuTarget() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public FndMenu(Long menuId, String menuName, String createdBy, String lastUpdatedBy) {
+	public FndMenuTarget(Long menuId, String menuName, String createdBy, String lastUpdatedBy) {
 		super();
 		this.menuId = menuId;
 		this.menuName = menuName;
@@ -49,7 +49,7 @@ public class FndMenu implements Serializable{
 			@JoinColumn(name = "menu_id", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "function_id",
 					nullable = false, updatable = false) })
-	private List<FndFormFunction> fndFormFunction;
+	private List<FndFormFunctionTarget> fndFormFunction;
 	
 	public Long getMenuId() {
 		return menuId;
@@ -76,11 +76,11 @@ public class FndMenu implements Serializable{
 		this.lastUpdatedBy = lastUpdatedBy;
 	}
 
-	public List<FndFormFunction> getFndFormFunction() {
+	public List<FndFormFunctionTarget> getFndFormFunction() {
 		return fndFormFunction;
 	}
 
-	public void setFndFormFunction(List<FndFormFunction> fndFormFunction) {
+	public void setFndFormFunction(List<FndFormFunctionTarget> fndFormFunction) {
 		this.fndFormFunction = fndFormFunction;
 	}
 	

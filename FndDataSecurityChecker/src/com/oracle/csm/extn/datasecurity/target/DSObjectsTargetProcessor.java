@@ -4,51 +4,80 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import com.oracle.csm.extn.datasecurity.dao.FndSecurityDAO;
-import com.oracle.csm.extn.datasecurity.domain.FndFormFunction;
-import com.oracle.csm.extn.datasecurity.domain.FndGrant;
-import com.oracle.csm.extn.datasecurity.domain.FndObject;
-import com.oracle.csm.extn.datasecurity.domain.FndObjectInstanceSet;
+import com.oracle.csm.extn.dao.FndSecurityDAO;
 import com.oracle.csm.extn.datasecurity.model.DataSecurityObjects;
+import com.oracle.csm.extn.domain.FndFormFunctionTarget;
+import com.oracle.csm.extn.domain.FndGrantTarget;
+import com.oracle.csm.extn.domain.FndObjectInstanceSetTarget;
+import com.oracle.csm.extn.domain.FndObjectTarget;
 
 public class DSObjectsTargetProcessor {
 
 	public static List<String> notFoundFndObjects;
+	private static ExecutorService executor = Executors.newFixedThreadPool(20);
 
 	public static Map<String, Map<DataSecurityObjects, List<Object>>> extractFndObjects(
 			Map<String, Map<DataSecurityObjects, List<Object>>> ootbObjectMap) {
-		FndSecurityDAO dao = new FndSecurityDAO();
-		Map<String, Map<DataSecurityObjects, List<Object>>> targetOotbObjectMap = new HashMap<String, Map<DataSecurityObjects, List<Object>>>();
+		final FndSecurityDAO dao = new FndSecurityDAO();
+		Map<String, Map<DataSecurityObjects, List<Object>>> targetOotbObjectMap = new HashMap<>();
 
-		List<String> objectList = new ArrayList<String>();
+		List<String> objectList = new ArrayList<>();
 		for (Map.Entry<String, Map<DataSecurityObjects, List<Object>>> entry : ootbObjectMap.entrySet()) {
 			String key = entry.getKey();
 			objectList.add(key);
 		}
 
-		List<FndObject> FndObjList = dao.getFndObject(objectList);
+		List<FndObjectTarget> FndObjList = dao.getFndObject(objectList);
 
-		List<Long> fndObjIdList = new ArrayList<Long>();
-		for (FndObject fndObject : FndObjList) {
-			fndObjIdList.add(fndObject.getObjectId());
+		List<Future<List<FndGrantTarget>>> fndGrantList = new ArrayList<>();
+		List<Long> fndObjectIdList = new ArrayList<>();
+		
+		long startTime2 = System.currentTimeMillis();
+		
+		for (final FndObjectTarget fndObject : FndObjList) {
+			fndObjectIdList.add(fndObject.getObjectId());
+			Future<List<FndGrantTarget>> result = executor.submit(new Callable<List<FndGrantTarget>>() {
+				@Override
+				public List<FndGrantTarget> call() throws Exception {
+					return dao.geFndGrants(fndObject.getObjectId());
+				}
+			});
+			fndGrantList.add(result);
+		}
+				
+		List<FndGrantTarget> fndGrants = new ArrayList<>();
+
+		for (@SuppressWarnings("rawtypes")
+		Future future : fndGrantList) {
+			try {
+				fndGrants.addAll((List)future.get());
+			} catch (InterruptedException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
-		List<FndGrant> fndGrants = dao.geFndGrants(fndObjIdList);
+	//	System.out.println(fndGrants.size());
+		System.out.println("Total time taken to fetch all grants after fetching the objects " + (System.currentTimeMillis() - startTime2) / 1000 + " seconds");
 
-		for (FndObject fndObj : FndObjList) {
+		for (FndObjectTarget fndObj : FndObjList) {
 
-			Map<DataSecurityObjects, List<Object>> targetDsMap = new HashMap<DataSecurityObjects, List<Object>>();
-			List<Object> grantList = new ArrayList<Object>();
-			List<Object> menuList = new ArrayList<Object>();
-//			List<Object> instanceSetList = new ArrayList<Object>();
-			List<Object> formFunctionsList = new ArrayList<Object>();
+			Map<DataSecurityObjects, List<Object>> targetDsMap = new HashMap<>();
+			List<Object> grantList = new ArrayList<>();
+			List<Object> menuList = new ArrayList<>();
+			List<Object> formFunctionsList = new ArrayList<>();
 
-			for (FndGrant fndGrant : fndGrants) {
+			for (FndGrantTarget fndGrant : fndGrants) {
 				if (fndObj.getObjName().equals(fndGrant.getFndObj().getObjName())) {
 					grantList.add(fndGrant);
 					menuList.add(fndGrant.getFndMenu());
-					for (FndFormFunction formFunction : fndGrant.getFndMenu().getFndFormFunction()) {
+					for (FndFormFunctionTarget formFunction : fndGrant.getFndMenu().getFndFormFunction()) {
 						formFunctionsList.add(formFunction);
 					}
 
@@ -60,42 +89,45 @@ public class DSObjectsTargetProcessor {
 			targetDsMap.put(DataSecurityObjects.FORM_FUNCIONS, formFunctionsList);
 
 			targetOotbObjectMap.put(fndObj.getObjName(), targetDsMap);
-			
 
 		}
 		
-		List<FndObjectInstanceSet> instaceSetList = dao.getFndObjectInstance(fndObjIdList);
-		for (FndObjectInstanceSet fndObjectInstanceSet : instaceSetList) {
+		List<FndObjectInstanceSetTarget> fndObjectIdListForInstance = new ArrayList<>();
+		
+		for (final FndObjectTarget fndObject : FndObjList) {
+			
+			Future<List<FndObjectInstanceSetTarget>> result = executor.submit(new Callable<List<FndObjectInstanceSetTarget>>() {
+				@Override
+				public List<FndObjectInstanceSetTarget> call() throws Exception {
+					return dao.getFndObjectInstance(fndObject.getObjectId());
+				}
+			});
+			
+			for (@SuppressWarnings("rawtypes")
+			Future future : fndGrantList) {
+				try {
+					fndObjectIdListForInstance.addAll((List)result.get());
+				} catch (InterruptedException | ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+		}
+		
+		
+		for (FndObjectInstanceSetTarget fndObjectInstanceSet : fndObjectIdListForInstance) {
 			
 			targetOotbObjectMap.get(fndObjectInstanceSet.getFndObj().getObjName()).get(DataSecurityObjects.INSTANCE_SETS).add(fndObjectInstanceSet);
 		}
-		/*
-		 * for (FndObject fndObject : FndObjList) {
-		 * 
-		 * List grantList = new ArrayList(); List menuList = new ArrayList(); List
-		 * fromFunctionList = new ArrayList(); List fndInstanceSetList = new
-		 * ArrayList();
-		 * 
-		 * List<Long> objIdList = new <Long>ArrayList();
-		 * 
-		 * objIdList.add(fndObject.getObjectId()); List<FndGrant> result =
-		 * dao.geFndGrants(objIdList); for (FndGrant fndGrant : result) {
-		 * 
-		 * grantList.add(fndGrant); targetDs.put(DataSecurityObjects.GRANTS, grantList);
-		 * 
-		 * menuList.add(fndGrant.getFndMenu()); targetDs.put(DataSecurityObjects.MENUS,
-		 * menuList); //fromFunctionList.add(fndGrant.get)
-		 * 
-		 * fromFunctionList.add(fndGrant.getFndMenu().getFndFormFunction());
-		 * targetDs.put(DataSecurityObjects.FORM_FUNCIONS, fromFunctionList);
-		 * 
-		 * fndInstanceSetList.add(fndGrant.getInstanceSet());
-		 * targetDs.put(DataSecurityObjects.INSTANCE_SETS, fndInstanceSetList);
-		 * 
-		 * }
-		 * 
-		 * targetOotbObjectMap.put(fndObject.getObjName(), targetDs); }
-		 */
+		
+		
+	//	List<FndObjectInstanceSetTarget> instaceSetList = dao.getFndObjectInstance(fndObjectIdList);
+		
+		
+		
+		System.out.println("Total time taken to prepare target map after fetching fnd objects " + (System.currentTimeMillis() - startTime2) / 1000 + " seconds");
 
 		return targetOotbObjectMap;
 	}

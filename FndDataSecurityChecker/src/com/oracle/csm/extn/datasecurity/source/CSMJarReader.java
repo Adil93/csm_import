@@ -12,17 +12,13 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 import javax.xml.bind.JAXBException;
 
 import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
 
-/**
- * @author dvijayan
- *
- */
 
 public class CSMJarReader {
 

@@ -19,9 +19,6 @@ public class FndObject {
 	@XmlElement(name = "LastUpdatedBy")
 	private String lastUpdatedBy;
 
-	@XmlElement(name = "FndObjectInstanceSets")
-	private List<FndObjectInstanceSet> fndObjectInstanceSets;
-
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -37,6 +34,9 @@ public class FndObject {
 	public void setLastUpdatedBy(String lastUpdatedBy) {
 		this.lastUpdatedBy = lastUpdatedBy;
 	}
+
+	@XmlElement(name = "FndObjectInstanceSets")
+	private List<FndObjectInstanceSet> fndObjectInstanceSets;
 
 	public String getObjName() {
 		return objName;
@@ -64,7 +64,7 @@ public class FndObject {
 
 	@Override
 	public String toString() {
-		return "FndObject [objName=" + objName + ", moduleId=" + moduleId + ", createdBy=" + createdBy
+		return "FndObjectTarget [objName=" + objName + ", moduleId=" + moduleId + ", createdBy=" + createdBy
 				+ ", lastUpdatedBy=" + lastUpdatedBy + ", fndObjectInstanceSets=" + fndObjectInstanceSets + "]";
 	}
 
