@@ -13,16 +13,17 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.oracle.csm.extn.datasecurity.domain.FndFormFunctionTarget;
+import com.oracle.csm.extn.datasecurity.domain.FndGrantTarget;
+import com.oracle.csm.extn.datasecurity.domain.FndMenuTarget;
+import com.oracle.csm.extn.datasecurity.domain.FndObjectInstanceSetTarget;
 import com.oracle.csm.extn.datasecurity.model.DataSecurityObjects;
 import com.oracle.csm.extn.datasecurity.model.FndFormFunction;
 import com.oracle.csm.extn.datasecurity.model.FndGrant;
 import com.oracle.csm.extn.datasecurity.model.FndMenu;
 import com.oracle.csm.extn.datasecurity.model.FndObjectInstanceSet;
+import com.oracle.csm.extn.datasecurity.source.DataSecurityProccessor;
 import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
-import com.oracle.csm.extn.domain.FndFormFunctionTarget;
-import com.oracle.csm.extn.domain.FndGrantTarget;
-import com.oracle.csm.extn.domain.FndMenuTarget;
-import com.oracle.csm.extn.domain.FndObjectInstanceSetTarget;
 
 /**
  * 
@@ -85,10 +86,17 @@ public class TargetValidator {
 							ootbObjectMap.get(objName).get(DataSecurityObjects.GRANTS),
 							targetOootbMap.get(objName).get(DataSecurityObjects.GRANTS), DataSecurityObjects.GRANTS);
 
+//				if (ootbObjectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS) != null
+//						&& targetOootbMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS) != null)
+//					instacneSets = (List<FndObjectInstanceSet>) (List) filterLists(
+//							ootbObjectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS),
+//							targetOootbMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS),
+//							DataSecurityObjects.INSTANCE_SETS);
+				
 				if (ootbObjectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS) != null
-						&& targetOootbMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS) != null)
+						&& targetOootbMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS) != null && DataSecurityProccessor.getMissingInstacneSetMap().containsKey(objName))
 					instacneSets = (List<FndObjectInstanceSet>) (List) filterLists(
-							ootbObjectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS),
+							DataSecurityProccessor.getMissingInstacneSetMap().get(objName),
 							targetOootbMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS),
 							DataSecurityObjects.INSTANCE_SETS);
 
@@ -97,6 +105,12 @@ public class TargetValidator {
 					fndMenus = (List<FndMenu>) (List) filterLists(
 							ootbObjectMap.get(objName).get(DataSecurityObjects.MENUS),
 							targetOootbMap.get(objName).get(DataSecurityObjects.MENUS), DataSecurityObjects.MENUS);
+//				if (ootbObjectMap.get(objName).get(DataSecurityObjects.MENUS) != null
+//						&& targetOootbMap.get(objName).get(DataSecurityObjects.MENUS) != null && DataSecurityProccessor.getMissingMenuMap().containsKey(objName))
+//					fndMenus = (List<FndMenu>) (List) filterLists(
+//							DataSecurityProccessor.getMissingMenuMap().get(objName),
+//							targetOootbMap.get(objName).get(DataSecurityObjects.MENUS), DataSecurityObjects.MENUS);
+				
 
 				if (ootbObjectMap.get(objName).get(DataSecurityObjects.FORM_FUNCIONS) != null
 						&& targetOootbMap.get(objName).get(DataSecurityObjects.FORM_FUNCIONS) != null)
@@ -286,8 +300,8 @@ public class TargetValidator {
 				for (T fndGrant : list) {
 					FndGrant grant = (FndGrant) fndGrant;
 					out.println(String.format(
-							"INSERT into FND_GRANTS (NAME,CREATED_BY,OBJECT_ID,MENU_ID) VALUES (\"%s\",\"%s\",\"%s\");",
-							grant.getName(), grant.getCreatedBy(), objId));
+							"INSERT into FND_GRANTS (GRANT_GUID,NAME,CREATED_BY,OBJECT_ID,MENU_ID) VALUES (\"%s\",\"%s\",\"%s\",\"%s\");",
+							grant.getGrantGuid(), grant.getName(), grant.getCreatedBy(), objId));
 				}
 
 			} else if (list.get(0) instanceof FndObjectInstanceSet) {
@@ -295,7 +309,7 @@ public class TargetValidator {
 
 					FndObjectInstanceSet instanceSet = (FndObjectInstanceSet) fndObjectInstanceSet;
 					out.println(String.format(
-							"INSERT into FND_OBJECT_INSTANCE_SET (INSTANCE_SET_NAME,CREATED_BY,OBJECT_ID) VALUES (\"%s\",\"%s\",\"%s\");",
+							"INSERT into FND_OBJECT_INSTANCE_SETS (INSTANCE_SET_NAME,CREATED_BY,OBJECT_ID) VALUES (\"%s\",\"%s\",\"%s\");",
 							instanceSet.getInstanceSetName(), instanceSet.getCreatedBy(), objId));
 
 				}

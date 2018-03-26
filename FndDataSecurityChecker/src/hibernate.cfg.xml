@@ -7,15 +7,15 @@
 		<property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
 		<property name="hibernate.connection.driver_class">oracle.jdbc.OracleDriver</property>
 		<property name="hibernate.connection.password">welcome1</property>
-		<property name="hibernate.connection.url">jdbc:oracle:thin:@slc11ggb.us.oracle.com:1521:r13csmcf</property>
+		<property name="hibernate.connection.url">jdbc:oracle:thin:@slc14htm.us.oracle.com:1521:r13csmcf</property>
 		<property name="hibernate.connection.username">fusion</property>
            
              <!-- List of XML mapping files -->
-		<mapping class="com.oracle.csm.extn.domain.FndObjectTarget" />
-	    <mapping class="com.oracle.csm.extn.domain.FndGrantTarget" />
-		<mapping class="com.oracle.csm.extn.domain.FndFormFunctionTarget" />
-		<mapping class="com.oracle.csm.extn.domain.FndMenuTarget" />
-		<mapping class="com.oracle.csm.extn.domain.FndObjectInstanceSetTarget" />
+		<mapping class="com.oracle.csm.extn.datasecurity.domain.FndObjectTarget" />
+	    <mapping class="com.oracle.csm.extn.datasecurity.domain.FndGrantTarget" />
+		<mapping class="com.oracle.csm.extn.datasecurity.domain.FndFormFunctionTarget" />
+		<mapping class="com.oracle.csm.extn.datasecurity.domain.FndMenuTarget" />
+		<mapping class="com.oracle.csm.extn.datasecurity.domain.FndObjectInstanceSetTarget" />
 		
 	</session-factory>
 </hibernate-configuration>

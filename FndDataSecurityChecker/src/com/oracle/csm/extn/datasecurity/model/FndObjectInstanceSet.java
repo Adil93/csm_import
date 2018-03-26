@@ -62,5 +62,30 @@ public class FndObjectInstanceSet {
 		return "FndObjectInstanceSetTarget [instanceSetName=" + instanceSetName + ", predicate=" + predicate + ", createdBy="
 				+ createdBy + ", lastUpdatedBy=" + lastUpdatedBy + "]";
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((instanceSetName == null) ? 0 : instanceSetName.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FndObjectInstanceSet other = (FndObjectInstanceSet) obj;
+		if (instanceSetName == null) {
+			if (other.instanceSetName != null)
+				return false;
+		} else if (!instanceSetName.equals(other.instanceSetName))
+			return false;
+		return true;
+	}
+	
+	
 
 }

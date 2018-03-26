@@ -45,6 +45,14 @@ public class DataSecurityProccessor {
 	private static Map<String, FndMenu> menuNameMap = new HashMap<String, FndMenu>();
 	private static Map<String, FndObject> objectNameMap = new HashMap<String, FndObject>();
 	private static Map<String, FndObjectInstanceSet> instanceSetNameMap = new HashMap<String, FndObjectInstanceSet>();
+	private static Set<String> fndObjectInstacneSetNames = new HashSet<>();
+	private static Set<String> fndMenuNames = new HashSet<>();
+	private static Map<String, List<Object>> missingInstacneSetMap = new HashMap<>();
+	private static Map<String, List<Object>> missingMenuMap = new HashMap<String, List<Object>>();
+
+	public static Map<String, List<Object>> getMissingMenuMap() {
+		return missingMenuMap;
+	}
 
 	public DataSecurityProccessor() {
 		// TODO Auto-generated constructor stub
@@ -154,6 +162,7 @@ public class DataSecurityProccessor {
 				if (fndObject.getFndObjectInstanceSets() != null)
 					for (FndObjectInstanceSet fndObjectInstanceSet : fndObject.getFndObjectInstanceSets()) {
 						objectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS).add(fndObjectInstanceSet);
+						fndObjectInstacneSetNames.add(fndObjectInstanceSet.getInstanceSetName());
 						instanceSetNameMap.put(fndObjectInstanceSet.getInstanceSetName(), fndObjectInstanceSet);
 					}
 
@@ -169,13 +178,30 @@ public class DataSecurityProccessor {
 					objectMap.get(objName).get(DataSecurityObjects.GRANTS).add(fndGrant);
 
 					if (fndGrant.getMenuName() != null && !"".equals(fndGrant.getMenuName())) {
-						if (menuNameMap.get(fndGrant.getMenuName()) != null)
-							objectMap.get(objName).get(DataSecurityObjects.MENUS)
-									.add(menuNameMap.get(fndGrant.getMenuName()));
-						else {
-							FndMenu fndMenu = new FndMenu(fndGrant.getMenuName());
-							fndMenu.setCreatedBy("SEED_DATA_FROM_APPLICATION");
-							objectMap.get(objName).get(DataSecurityObjects.MENUS).add(fndMenu);
+
+						if (!fndMenuNames.contains(fndGrant.getMenuName())) {
+							if (menuNameMap.containsKey(fndGrant.getMenuName())) {
+								if (menuNameMap.get(fndGrant.getMenuName()) != null) {
+									objectMap.get(objName).get(DataSecurityObjects.MENUS)
+											.add(menuNameMap.get(fndGrant.getMenuName()));
+
+								}
+							 else {
+								FndMenu fndMenu = new FndMenu(fndGrant.getMenuName());
+								fndMenu.setCreatedBy("SEED_DATA_FROM_APPLICATION");
+								objectMap.get(objName).get(DataSecurityObjects.MENUS).add(fndMenu);
+								if(missingMenuMap.containsKey(objName))
+								{
+									missingMenuMap.get(objName).add(fndMenu);
+								}
+								else {
+									missingMenuMap.put(objName, new ArrayList<>());
+									missingMenuMap.get(objName).add(fndMenu);
+								}
+								
+							}}
+
+							fndMenuNames.add(fndGrant.getMenuName());
 						}
 					}
 
@@ -196,11 +222,20 @@ public class DataSecurityProccessor {
 								}
 							}
 						}
-						if (!found) {
+						if (!found && !fndObjectInstacneSetNames.contains(fndGrant.getInstanceSetName())) {
 							FndObjectInstanceSet fndObjectInstanceSet = new FndObjectInstanceSet(
 									fndGrant.getInstanceSetName());
 							fndObjectInstanceSet.setCreatedBy("SEED_DATA_FROM_APPLICATION");
 							objectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS).add(fndObjectInstanceSet);
+							fndObjectInstacneSetNames.add(fndGrant.getInstanceSetName());
+							if (!objName.endsWith("_c")) {
+								if (missingInstacneSetMap.containsKey(objName)) {
+									missingInstacneSetMap.get(objName).add(fndObjectInstanceSet);
+								} else {
+									missingInstacneSetMap.put(objName, new ArrayList<>());
+									missingInstacneSetMap.get(objName).add(fndObjectInstanceSet);
+								}
+							}
 						}
 
 					}
@@ -264,27 +299,27 @@ public class DataSecurityProccessor {
 
 		final boolean[] result = new boolean[2];
 
-		 Thread zmmThread = new Thread(() -> {
-		 result[0] = zmmNotesValidation();
-		
-		 }, "ZMMNOTES_THREAD");
-		
-		 Thread customObjectThread = new Thread(() -> {
-		 result[1] = customObjectValidation();
-		 }, "CUSTOM_OBJECTS_THREAD");
-		
-		 zmmThread.start();
-		 customObjectThread.start();
-		
-		 try {
-		 zmmThread.join();
-		 customObjectThread.join();
-		 } catch (InterruptedException e) {
-		 e.printStackTrace();
-		 }
+		Thread zmmThread = new Thread(() -> {
+			result[0] = zmmNotesValidation();
 
-//		result[0] = zmmNotesValidation();
-//		result[1] = customObjectValidation();
+		}, "ZMMNOTES_THREAD");
+
+		Thread customObjectThread = new Thread(() -> {
+			result[1] = customObjectValidation();
+		}, "CUSTOM_OBJECTS_THREAD");
+
+		zmmThread.start();
+		customObjectThread.start();
+
+		try {
+			zmmThread.join();
+			customObjectThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// result[0] = zmmNotesValidation();
+		// result[1] = customObjectValidation();
 		return result[0] && result[1];
 
 	}
@@ -312,8 +347,8 @@ public class DataSecurityProccessor {
 			fndGrants = entry.getValue().get(DataSecurityObjects.GRANTS).stream().map(obj -> (FndGrant) obj)
 					.collect(Collectors.toList());
 
-			// put a warning here instead of considering as invalid 
-			
+			// put a warning here instead of considering as invalid
+
 			for (FndGrant fndGrant : fndGrants) {
 
 				String instanceSetName = fndGrant.getInstanceSetName();
@@ -438,6 +473,10 @@ public class DataSecurityProccessor {
 
 	public static List<FndMenu> getWholeFndMenus() {
 		return wholeFndMenus;
+	}
+
+	public static Map<String, List<Object>> getMissingInstacneSetMap() {
+		return missingInstacneSetMap;
 	}
 
 }

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import com.oracle.csm.extn.dao.FndSecurityDAO;
-import com.oracle.csm.extn.domain.FndGrantTarget;
+import com.oracle.csm.extn.datasecurity.dao.FndSecurityDAO;
+import com.oracle.csm.extn.datasecurity.domain.FndGrantTarget;
 
 public class CsmTargetCall implements Callable<List<FndGrantTarget>>{
 	FndSecurityDAO dao = new FndSecurityDAO();
