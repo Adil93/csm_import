@@ -4,20 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 
-import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
-import com.oracle.csm.extn.datasecurity.utils.HibernateUtil;
+import com.oracle.csm.extn.datasecurity.domain.FndFormFunctionTarget;
 import com.oracle.csm.extn.datasecurity.domain.FndGrantTarget;
 import com.oracle.csm.extn.datasecurity.domain.FndObjectInstanceSetTarget;
 import com.oracle.csm.extn.datasecurity.domain.FndObjectTarget;
+import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
+import com.oracle.csm.extn.datasecurity.utils.HibernateUtil;
 
+/**
+ * 
+ * @author pruthvi.minchinadka
+ *
+ */
 public class FndSecurityDAO {
 
 	private static Logger logger = DSLoggerUtil.getLogger();
@@ -56,6 +59,17 @@ public class FndSecurityDAO {
 				"Total: " + resultsList.size()
 						+ " FndObjectInstanceSets are retrived from the target db for object id:!" + objId + " --  In "
 						+ (System.currentTimeMillis() - startTime) / 1000 + " seconds");
+		return resultsList;
+	}
+	
+	public List<FndFormFunctionTarget> getFndFormFunction(Long objId) {
+		long startTime = System.currentTimeMillis();
+		Session s = HibernateUtil.getSession();
+		List<FndFormFunctionTarget> resultsList = new ArrayList<>();
+		resultsList = (List) s.createCriteria(FndFormFunctionTarget.class).createAlias("fndObject", "o")
+				.add(Restrictions.eq("o.objectId", objId)).list();
+		
+		logger.log(Level.INFO, "Total: " + resultsList.size() + " FndFormFunction are retrived from the target db for object id:!"+ objId +" --  In "+(System.currentTimeMillis() - startTime) / 1000 + " seconds");
 		return resultsList;
 	}
 

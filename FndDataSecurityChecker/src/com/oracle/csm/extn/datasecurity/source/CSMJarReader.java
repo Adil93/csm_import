@@ -26,7 +26,7 @@ public class CSMJarReader {
 	private static List<String> modules = Arrays.asList("ACO", "AFS", "AHE", "AHT", "ATC", "CSH", "CSO", "EMC", "EMK",
 			"EMV", "EWM", "FOD", "FATP", "HZ", "MCT", "MKL", "LOY", "MKS", "MKT", "MOO", "MOP", "MOT", "MOW", "OKC",
 			"OSS", "QOC", "QSC", "SVC", "ZBS", "ZCA", "ZCC", "ZCH", "ZCM", "ZCP", "ZCQ", "ZCX", "ZMC", "ZMM", "ZMS",
-			"ZOC", "ZON", "ZPM", "ZPS", "ZQP", "ZSF", "ZSO", "ZSO", "ZVC", "TMP");
+			"ZOC", "ZON", "ZPM", "ZPS", "ZQP", "ZSF", "ZSO", "ZSO", "ZVC", "TMP","FUN");
 
 	private static byte[] copyStream(InputStream in, ZipEntry entry) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
