@@ -46,6 +46,14 @@ public class TargetValidator {
 	private static final String fndFormFunctionTLSqlfile = "sqls/fndFormFunctionTL.sql";
 	private static final String fndMenusTLSqlfile = "sqls/fndMenusTL.sql";
 
+	// Counters for unique IDs
+	private static int instanceCounter = 10;
+	private static int instanceTLCounter = 10;
+	private static int functionCounter = 10;
+	private static int functionTLCounter = 10;
+	private static int menuCounter = 10;
+	private static int menuTLCounter = 10;
+
 	/**
 	 * 
 	 * @param ootbObjectMap
@@ -265,7 +273,7 @@ public class TargetValidator {
 			break;
 
 		case FORM_FUNCIONS:
-			List<com.oracle.csm.extn.datasecurity.model.FndFormFunction> sourceFndFormFunctions = new ArrayList<>();
+			List<FndFormFunction> sourceFndFormFunctions = new ArrayList<>();
 			for (Object obj : sourceOotb) {
 				sourceFndFormFunctions.add((FndFormFunction) obj);
 			}
@@ -277,7 +285,8 @@ public class TargetValidator {
 			for (FndFormFunction sourceFormFunction : sourceFndFormFunctions) {
 				boolean found = false;
 				for (FndFormFunctionTarget targetFormFunction : targetFndFormFunctions) {
-					if (sourceFormFunction.getFunctionName().equals(targetFormFunction.getFunctionName())) {
+					if (sourceFormFunction.getFunctionName().equals(targetFormFunction.getFunctionName())
+							) {
 						found = true;
 						break;
 					}
@@ -304,7 +313,6 @@ public class TargetValidator {
 		try (FileWriter fw = new FileWriter(sqlFilename, true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
-			int idCounter = 10;
 			Date currentDate = new Date();
 			SimpleDateFormat sdf3 = new SimpleDateFormat("ddMMyyyy");
 			String datePrefix = sdf3.format(currentDate) + "00";
@@ -328,15 +336,16 @@ public class TargetValidator {
 				for (T fndObjectInstanceSet : list) {
 
 					FndObjectInstanceSet instanceSet = (FndObjectInstanceSet) fndObjectInstanceSet;
-					String instanceSetId = "22" + datePrefix + idCounter;
 
 					if (sqlFilename.contains("TL")) {
+						String instanceSetId = "22" + datePrefix + instanceTLCounter;
+
 						out.println(String.format(
 								"Insert into FND_OBJECT_INSTANCE_SETS_TL (INSTANCE_SET_ID,LANGUAGE,SOURCE_LANG,DISPLAY_NAME,DESCRIPTION,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE,LAST_UPDATE_LOGIN,ENTERPRISE_ID,DISPLAY_SHORT_NAME,SANDBOX_ID,CHANGE_SINCE_LAST_REFRESH,SEED_DATA_SOURCE) values"
 										+ "('%s','US','US','Access the sales forecast item for table"
 										+ instanceSet.getInstanceSetName()
 										+ "for the territory hierarchy that they owned previously for the active forecast for test 00"
-										+ idCounter + "',null,'%s',%s,'%s',%s,'-1',1,null,'1','N',null);",
+										+ instanceTLCounter + "',null,'%s',%s,'%s',%s,'-1',1,null,'1','N',null);",
 								instanceSetId, user, toTabletimeStmap, user, toTabletimeStmap));
 
 						out.println(String.format(
@@ -344,17 +353,19 @@ public class TargetValidator {
 										+ "('%s','KO','US','Access the sales forecast item for table"
 										+ instanceSet.getInstanceSetName()
 										+ "for the territory hierarchy that they owned previously for the active forecast for test 00"
-										+ idCounter + "',null,'%s',%s,'%s',%s,'-1',1,null,'1','N',null);",
+										+ instanceTLCounter + "',null,'%s',%s,'%s',%s,'-1',1,null,'1','N',null);",
 								instanceSetId, user, toTabletimeStmap, user, toTabletimeStmap));
+						instanceTLCounter++;
 
 					} else {
+						String instanceSetId = "22" + datePrefix + instanceCounter;
 						out.println(String.format(
 								"Insert into FND_OBJECT_INSTANCE_SETS (INSTANCE_SET_ID,INSTANCE_SET_NAME,OBJECT_ID,PREDICATE,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE,LAST_UPDATE_LOGIN,ENTERPRISE_ID,SANDBOX_ID,PROGRAM_NAME,PROGRAM_TAG,FILTER,CHANGE_SINCE_LAST_REFRESH,SEED_DATA_SOURCE) VALUES "
 										+ "('%s','%s','%s','1=1','%s',%s,'%s',%s,'-1',1,'1',null,null,null,'N',null);",
 								instanceSetId, instanceSet.getInstanceSetName(), objId, user, toTabletimeStmap, user,
 								toTabletimeStmap));
+						instanceCounter++;
 					}
-					idCounter++;
 
 				}
 
@@ -365,10 +376,9 @@ public class TargetValidator {
 					FndFormFunctionTarget testFunction = (FndFormFunctionTarget) targetOootbMap
 							.get(formFunction.getObjectName()).get(DataSecurityObjects.FORM_FUNCIONS).get(0);
 					String moduleId = testFunction.getFndObject().getModuleId();
-					String functionId = "44" + datePrefix + idCounter;
 
 					if (sqlFilename.contains("TL")) {
-
+						String functionId = "44" + datePrefix + functionTLCounter;
 						out.println(String.format(
 								"Insert into FND_FORM_FUNCTIONS_TL (FUNCTION_ID,LANGUAGE,SOURCE_LANG,USER_FUNCTION_NAME,DESCRIPTION,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE,LAST_UPDATE_LOGIN,ENTERPRISE_ID,SANDBOX_ID,CHANGE_SINCE_LAST_REFRESH,SEED_DATA_SOURCE) values"
 										+ " ('%s','US','US','%s','%s','%s',%s,'%s',%s,'-1',1,'1','N',null);",
@@ -380,16 +390,18 @@ public class TargetValidator {
 										+ " ('%s','KO','US','%s','%s','%s',%s,'%s',%s,'-1',1,'1','N',null);",
 								functionId, formFunction.getFunctionName(), formFunction.getFunctionName(), user,
 								toTabletimeStmap, user, toTabletimeStmap));
+						functionTLCounter++;
 
 					} else {
+						String functionId = "44" + datePrefix + functionCounter;
 						out.println(String.format(
 								"Insert into FND_FORM_FUNCTIONS (FUNCTION_ID,FUNCTION_NAME,OBJECT_ID,MODULE_ID,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE,LAST_UPDATE_LOGIN,ENTERPRISE_ID,FUNCTION_SECURITY_ONLY,SANDBOX_ID,CHANGE_SINCE_LAST_REFRESH,SEED_DATA_SOURCE) values "
 										+ " ('%s','%s','%s','%s','%s',%s,'%s',%s,'-1',1,'N','1','N',null);",
 								functionId, formFunction.getFunctionName(), objId, moduleId, user, toTabletimeStmap,
 								user, toTabletimeStmap));
+						functionCounter++;
 					}
 
-					idCounter++;
 				}
 
 			} else if (list.get(0) instanceof FndMenu) {
@@ -399,24 +411,29 @@ public class TargetValidator {
 					FndObjectInstanceSetTarget fndObjectInstanceSetTarget = (FndObjectInstanceSetTarget) targetOootbMap
 							.get(objName).get(DataSecurityObjects.INSTANCE_SETS).get(0);
 					String moduleid = fndObjectInstanceSetTarget.getFndObj().getModuleId();
-					String menuId = "66" + datePrefix + idCounter;
 
 					if (sqlFilename.contains("TL")) {
+						String menuId = "66" + datePrefix + menuTLCounter;
 						out.println(String.format(
 								"Insert into FND_MENUS_TL (MENU_ID,LANGUAGE,SOURCE_LANG,USER_MENU_NAME,DESCRIPTION,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE,LAST_UPDATE_LOGIN,ENTERPRISE_ID,SANDBOX_ID,CHANGE_SINCE_LAST_REFRESH,SEED_DATA_SOURCE) values "
 										+ "('%s','US','US','%s','%s','%s',%s,'%s',%s,'-1',1,'1','N',null);",
-								menuId, menu.getMenuName(), menu.getMenuName() + " for test 00" + idCounter, user,
+								menuId, menu.getMenuName(), menu.getMenuName() + " for test 00" + menuTLCounter, user,
 								toTabletimeStmap, user, toTabletimeStmap));
 
 						out.println(String.format(
 								"Insert into FND_MENUS_TL (MENU_ID,LANGUAGE,SOURCE_LANG,USER_MENU_NAME,DESCRIPTION,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE,LAST_UPDATE_LOGIN,ENTERPRISE_ID,SANDBOX_ID,CHANGE_SINCE_LAST_REFRESH,SEED_DATA_SOURCE) values "
 										+ "('%s','KO','US','%s','%s','%s',%s,'%s',%s,'-1',1,'1','N',null);",
-								menuId, menu.getMenuName(), menu.getMenuName() + " for test 00" + idCounter, user,
+								menuId, menu.getMenuName(), menu.getMenuName() + " for test 00" + menuTLCounter, user,
 								toTabletimeStmap, user, toTabletimeStmap));
+
+						menuTLCounter++;
 					} else {
+						String menuId = "66" + datePrefix + menuCounter;
 						out.println(String.format(
 								"Insert into FND_MENUS (MENU_ID,MENU_NAME,MODULE_ID,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE,LAST_UPDATE_LOGIN,ENTERPRISE_ID,SANDBOX_ID,CHANGE_SINCE_LAST_REFRESH,SEED_DATA_SOURCE) values ('%s','%s','%s','%s',%s,'%s',%s,'-1',1,'1','N',null);",
 								menuId, menu.getMenuName(), moduleid, user, toTabletimeStmap, user, toTabletimeStmap));
+
+						menuCounter++;
 					}
 				}
 

@@ -49,10 +49,11 @@ public class DSMain {
 		try {
 			long start = System.currentTimeMillis();
 
-			String testObjName = "FUN_ALL_BUSINESS_UNITS_V";// "ZSF_FCST_ITEM_DETAIL"; // "SVC_SERVICE_REQUESTS"
+			String testObjName = "ZMM_NOTES";//"FUN_ALL_BUSINESS_UNITS_V";// "ZSF_FCST_ITEM_DETAIL"; // "SVC_SERVICE_REQUESTS"
 			String testObjName1 = "ZCA_REF_ENTITIES";
 			String testObjName2 = "MOT_REF_ENTITIES";
 			String testObjName3 = "ZBS_REFERENCE_PROFILES_XM";
+			
 
 			// Testing purpose
 
@@ -64,7 +65,8 @@ public class DSMain {
 			// String csmJarFilePath =
 			// "/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/14_03_2018/CS_STRCSM1SRCGSIR121_R13.17.11_PB14_PRE_UPG_BI_ENABLED_2018_0208_0826PST_957591183009343.jar";
 			
-			String csmJarFilePath = "/Volumes/DATA/Adil_Work/OVM/Fus73/csm_jars/CS_GSE_R13_1711D_PB12_02052018_644394682476226.jar";
+			String csmJarFilePath ="/Volumes/DATA/Adil_Work/OVM/Fus158/csm_jar/CS_STRCSM1SRCGSIR121_R13.18.02_PB4_PRE_UPG_BI_ENABLED_2018_0419_0806PST_3312556939401658.jar";
+			//"/Volumes/DATA/Adil_Work/OVM/Fus73/csm_jars/CS_GSE_R13_1711D_PB12_02052018_644394682476226.jar";
 			logger.log(Level.INFO, "Reading the CSM jar file");
 
 			// Reading and processing the datasecurity XML files
