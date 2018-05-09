@@ -25,13 +25,20 @@ public class SourceCsmValidator {
 
 		final boolean[] result = new boolean[2];
 
-		Thread zmmThread = new Thread(() -> {
-			result[0] = zmmNotesValidation(customObjectMap);
+		Thread zmmThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				result[0] = zmmNotesValidation(customObjectMap);
 
+			}
 		}, "ZMMNOTES_THREAD");
 
-		Thread customObjectThread = new Thread(() -> {
-			result[1] = customObjectValidation(customObjectMap);
+		Thread customObjectThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				result[1] = customObjectValidation(customObjectMap);
+
+			}
 		}, "CUSTOM_OBJECTS_THREAD");
 
 		zmmThread.start();

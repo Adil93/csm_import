@@ -123,8 +123,6 @@ public class DataSecurityProccessor {
 				zmmAppCompNotesGrants = fndGrants;
 			}
 
-			// want to add here as well
-
 			for (FndGrant fndGrant : fndGrants) {
 				wholeFndGrants.add(fndGrant);
 
@@ -150,18 +148,6 @@ public class DataSecurityProccessor {
 
 			for (FndMenu fndMenu : fndMenus) {
 				wholeFndMenus.add(fndMenu);
-				/**for (FndMenuEntries fndMenuEntries : fndMenu.getFndMenuEntries()) {
-					if (!functionNameMap
-							.containsKey(fndMenuEntries.getFormFunction() + ">" + fndMenuEntries.getObjName())) {
-						FndFormFunction fndFormFunction = new FndFormFunction();
-						fndFormFunction.setFunctionName(fndMenuEntries.getFormFunction());
-						fndFormFunction.setObjectName(fndMenuEntries.getObjName());
-						fndFormFunction.setCreatedBy("CUSTOMIZED_USER");
-						wholeFndFormFunctions.add(fndFormFunction);
-						functionNameMap.put(fndMenuEntries.getFormFunction() + ">" + fndMenuEntries.getObjName(),
-								fndFormFunction);
-					}
-				}**/
 				if (!menuNameMap.containsKey(fndMenu.getMenuName())) {
 					menuNameMap.put(fndMenu.getMenuName(), fndMenu);
 				}
@@ -277,7 +263,7 @@ public class DataSecurityProccessor {
 					objectMap.get(objName).get(DataSecurityObjects.INSTANCE_SETS).add(fndObjectInstanceSet);
 				}
 			}
-			for(FndMenu fndMenu : wholeFndMenus) {
+			for (FndMenu fndMenu : wholeFndMenus) {
 				for (FndMenuEntries fndMenuEntries : fndMenu.getFndMenuEntries()) {
 					if (!functionNameMap
 							.containsKey(fndMenuEntries.getFormFunction() + ">" + fndMenuEntries.getObjName())) {

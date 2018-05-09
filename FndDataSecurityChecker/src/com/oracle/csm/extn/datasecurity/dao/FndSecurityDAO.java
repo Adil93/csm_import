@@ -57,7 +57,7 @@ public class FndSecurityDAO {
 
 		logger.log(Level.INFO,
 				"Total: " + resultsList.size()
-						+ " FndObjectInstanceSets are retrived from the target db for object id:!" + objId + " --  In "
+						+ " FndObjectInstanceSets are retrived from the target db for object id:" + objId + " --  In "
 						+ (System.currentTimeMillis() - startTime) / 1000 + " seconds");
 		return resultsList;
 	}
@@ -69,7 +69,7 @@ public class FndSecurityDAO {
 		resultsList = (List) s.createCriteria(FndFormFunctionTarget.class).createAlias("fndObject", "o")
 				.add(Restrictions.eq("o.objectId", objId)).list();
 		
-		logger.log(Level.INFO, "Total: " + resultsList.size() + " FndFormFunction are retrived from the target db for object id:!"+ objId +" --  In "+(System.currentTimeMillis() - startTime) / 1000 + " seconds");
+		logger.log(Level.INFO, "Total: " + resultsList.size() + " FndFormFunction are retrived from the target db for object id:"+ objId +" --  In "+(System.currentTimeMillis() - startTime) / 1000 + " seconds");
 		return resultsList;
 	}
 

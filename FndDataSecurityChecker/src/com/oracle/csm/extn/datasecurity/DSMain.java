@@ -1,5 +1,7 @@
 package com.oracle.csm.extn.datasecurity;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -49,27 +51,19 @@ public class DSMain {
 		try {
 			long start = System.currentTimeMillis();
 
-			String testObjName = "ZMM_NOTES";//"FUN_ALL_BUSINESS_UNITS_V";// "ZSF_FCST_ITEM_DETAIL"; // "SVC_SERVICE_REQUESTS"
-			String testObjName1 = "ZCA_REF_ENTITIES";
-			String testObjName2 = "MOT_REF_ENTITIES";
-			String testObjName3 = "ZBS_REFERENCE_PROFILES_XM";
-			
-
 			// Testing purpose
-
+			String testObjName = "ZMM_NOTES";
 			ootbSourceObjectMap_test.put(testObjName, null);
-			// ootbSourceObjectMap_test.put(testObjName1, null);
-			// ootbSourceObjectMap_test.put(testObjName2, null);
-			// ootbSourceObjectMap_test.put(testObjName3, null);
 
-			// String csmJarFilePath =
-			// "/Volumes/DATA/Adil_Work/OVM/Fus152/CSM_Jars/14_03_2018/CS_STRCSM1SRCGSIR121_R13.17.11_PB14_PRE_UPG_BI_ENABLED_2018_0208_0826PST_957591183009343.jar";
-			
-			String csmJarFilePath ="/Volumes/DATA/Adil_Work/OVM/Fus158/csm_jar/CS_STRCSM1SRCGSIR121_R13.18.02_PB4_PRE_UPG_BI_ENABLED_2018_0419_0806PST_3312556939401658.jar";
-			//"/Volumes/DATA/Adil_Work/OVM/Fus73/csm_jars/CS_GSE_R13_1711D_PB12_02052018_644394682476226.jar";
+			String csmJarFilePath = args[0];
+			// "/Volumes/DATA/Adil_Work/OVM/Fus73/csm_jars/vamsi/CS_GSE_1802GA_04082018_144638633755336.jar";
+			if (csmJarFilePath == null || "".equals(csmJarFilePath) || !new File(csmJarFilePath).exists()) {
+				logger.log(Level.INFO, "Provide a valid CSM path");
+				throw new FileNotFoundException("CSM Jar path is not valid");
+			}
 			logger.log(Level.INFO, "Reading the CSM jar file");
 
-			// Reading and processing the datasecurity XML files
+			// Reading and processing the data security XML files
 			CSMJarReader.read(new URL("jar:file:/" + csmJarFilePath + "!/"));
 
 			logger.log(Level.INFO, "Proccessing Objects and its related dependent seed datas");
