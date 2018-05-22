@@ -1,10 +1,14 @@
 package com.oracle.csm.extn.datasecurity.utils;
 
+import javax.imageio.spi.ServiceRegistry;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 
 /**
  * 
@@ -24,9 +28,11 @@ public class HibernateUtil {
 		configuration.setProperty("hibernate.connection.password",
 				ConfigurationReaderUtil.getConfigurationProperty("hibernate.connection.password"));
 
-		ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties())
-				.buildServiceRegistry();
-		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+		StandardServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml")
+				.applySettings(configuration.getProperties()).build();
+		Metadata metaData = new MetadataSources(standardRegistry).getMetadataBuilder().build();
+		sessionFactory = metaData.getSessionFactoryBuilder().build();
+
 		return sessionFactory;
 	}
 

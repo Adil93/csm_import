@@ -1,5 +1,6 @@
 package com.oracle.csm.extn.datasecurity.source;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,8 @@ import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
 public class SourceCsmValidator {
 	private static Logger logger = DSLoggerUtil.getLogger();
 
-	public static boolean validateSourceData(Map<String, Map<DataSecurityObjects, List<Object>>> customObjectMap) {
+	public static boolean validateSourceData(
+			final Map<String, Map<DataSecurityObjects, List<Object>>> customObjectMap) {
 		// Write logics for Source data validations
 		logger.log(Level.INFO, "Validating Source CSM data........[Mainly Custom Object validation]");
 
@@ -59,14 +61,14 @@ public class SourceCsmValidator {
 
 	private static boolean customObjectValidation(Map<String, Map<DataSecurityObjects, List<Object>>> customObjectMap) {
 		// to be changed
-		logger.log(Level.INFO, "Validating CustomObjects instacne set and menu dependencies");
+		logger.log(Level.INFO, "Validating CustomObjects instance set and menu dependencies");
 
 		boolean customObjectValid = true;
 
 		Set<String> validGrantNames = new HashSet<String>();
 		Set<String> invalidGrantNames = new HashSet<String>();
 
-		List<FndGrant> fndGrants = null;
+		List<FndGrant> fndGrants = new ArrayList<>();
 
 		int objCount = customObjectMap.keySet().size();
 		logger.log(Level.INFO, "Total number of custom Objects : " + objCount);
@@ -76,9 +78,11 @@ public class SourceCsmValidator {
 			int grantSize = entry.getValue().get(DataSecurityObjects.GRANTS).size();
 
 			logger.log(Level.FINE, "Object : " + entry.getKey() + " has " + grantSize + " grants");
-
-			fndGrants = entry.getValue().get(DataSecurityObjects.GRANTS).stream().map(obj -> (FndGrant) obj)
-					.collect(Collectors.toList());
+			if(entry.getValue().get(DataSecurityObjects.GRANTS).size()>0 && entry.getValue().get(DataSecurityObjects.GRANTS)!=null)
+				for (Object obj : entry.getValue().get(DataSecurityObjects.GRANTS)) {
+					if(obj!=null)
+						fndGrants.add((FndGrant) obj);
+				}
 
 			// put a warning here instead of considering as invalid
 

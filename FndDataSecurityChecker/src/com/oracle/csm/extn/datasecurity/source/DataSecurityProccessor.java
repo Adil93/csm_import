@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.JAXBIntrospector;
 import javax.xml.bind.Unmarshaller;
 
 import com.oracle.csm.extn.datasecurity.model.DataSecurityObjects;
@@ -73,15 +73,19 @@ public class DataSecurityProccessor {
 		// TODO Auto-generated constructor stub
 	}
 
-	protected static void proccessXml(ByteArrayInputStream byteArrayInputStream, String name) {
+	protected static void proccessXml(ByteArrayInputStream byteArrayInputStream, String name)  {
 		JAXBContext jc;
 		try {
+		
 			jc = JAXBContext.newInstance(SeedData.class);
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
+			
+			SeedData seedData =(SeedData) JAXBIntrospector.getValue(unmarshaller.unmarshal(byteArrayInputStream));
 
-			SeedData seedData = (SeedData) unmarshaller.unmarshal(byteArrayInputStream);
+//			SeedData seedData = (SeedData) unmarshaller.unmarshal(byteArrayInputStream);
 
 			if (name.contains("FndObjectsSD.xml")) {
+				
 				if (seedData.getFndObjects() != null) {
 					processFNDObjectsXML(seedData.getFndObjects(), name);
 				}

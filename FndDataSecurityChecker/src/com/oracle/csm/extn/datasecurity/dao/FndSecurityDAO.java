@@ -25,6 +25,7 @@ public class FndSecurityDAO {
 
 	private static Logger logger = DSLoggerUtil.getLogger();
 
+	@SuppressWarnings("unchecked")
 	public List<FndObjectTarget> getFndObject(List<String> objNameList) {
 		Session s = HibernateUtil.getSession();
 		List<FndObjectTarget> resultsList = new ArrayList<>();

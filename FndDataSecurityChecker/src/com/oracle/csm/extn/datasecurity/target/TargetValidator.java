@@ -36,15 +36,15 @@ import com.oracle.csm.extn.datasecurity.utils.DSLoggerUtil;
 public class TargetValidator {
 	private static java.util.logging.Logger logger = DSLoggerUtil.getLogger();
 
-	private static final String fndGrantSqlfile = "sqls/fndGrants.sql";
-	private static final String fndInstanceSetsSqlfile = "sqls/fndInstanceSets.sql";
-	private static final String fndFormFunctionSqlfile = "sqls/fndFormFunctions.sql";
-	private static final String fndMenusSqlfile = "sqls/fndMenus.sql";
+	public static  String fndGrantSqlfile = "/sqls/fndGrants.sql";
+	public static  String fndInstanceSetsSqlfile = "/sqls/fndInstanceSets.sql";
+	public static  String fndFormFunctionSqlfile = "/sqls/fndFormFunctions.sql";
+	public static  String fndMenusSqlfile = "/sqls/fndMenus.sql";
 
 	// Translation depended files
-	private static final String fndInstanceSetsTLSqlfile = "sqls/fndInstanceSetsTL.sql";
-	private static final String fndFormFunctionTLSqlfile = "sqls/fndFormFunctionTL.sql";
-	private static final String fndMenusTLSqlfile = "sqls/fndMenusTL.sql";
+	public static  String fndInstanceSetsTLSqlfile = "/sqls/fndInstanceSetsTL.sql";
+	public static  String fndFormFunctionTLSqlfile = "/sqls/fndFormFunctionTL.sql";
+	public static  String fndMenusTLSqlfile = "/sqls/fndMenusTL.sql";
 
 	// Counters for unique IDs
 	private static int instanceCounter = 10;

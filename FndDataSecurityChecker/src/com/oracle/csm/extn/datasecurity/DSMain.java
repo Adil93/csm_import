@@ -15,7 +15,6 @@ import javax.xml.bind.JAXBException;
 
 //import com.oracle.csm.extn.datasecurity.domain.FndObject;
 import com.oracle.csm.extn.datasecurity.model.DataSecurityObjects;
-import com.oracle.csm.extn.datasecurity.model.FndFormFunction;
 import com.oracle.csm.extn.datasecurity.source.CSMJarReader;
 import com.oracle.csm.extn.datasecurity.source.DataSecurityProccessor;
 import com.oracle.csm.extn.datasecurity.source.SourceCsmValidator;
@@ -33,7 +32,6 @@ public class DSMain {
 
 	static {
 		ConfigurationReaderUtil.loadConfigurations();
-		TargetValidator.truncateExistingFiles();
 	}
 
 	private static Logger logger = DSLoggerUtil.getLogger();
@@ -49,17 +47,36 @@ public class DSMain {
 	 */
 	public static void main(String[] args) throws JAXBException {
 		try {
+
 			long start = System.currentTimeMillis();
+			String csmJarFilePath = "";
+			String sqlPath = "";
 
 			// Testing purpose
 			String testObjName = "ZMM_NOTES";
 			ootbSourceObjectMap_test.put(testObjName, null);
 
-			String csmJarFilePath = args[0];
-			// "/Volumes/DATA/Adil_Work/OVM/Fus73/csm_jars/vamsi/CS_GSE_1802GA_04082018_144638633755336.jar";
+			if (args.length > 0) {
+				csmJarFilePath = args[0];
+			}
+			if (args.length > 1) {
+				sqlPath = args[1];
+			}
+
+			TargetValidator.fndFormFunctionSqlfile = sqlPath + TargetValidator.fndFormFunctionSqlfile;
+			TargetValidator.fndFormFunctionTLSqlfile = sqlPath + TargetValidator.fndFormFunctionTLSqlfile;
+
+			TargetValidator.fndGrantSqlfile = sqlPath + TargetValidator.fndGrantSqlfile;
+
+			TargetValidator.fndInstanceSetsSqlfile = sqlPath + TargetValidator.fndInstanceSetsSqlfile;
+			TargetValidator.fndInstanceSetsTLSqlfile = sqlPath + TargetValidator.fndInstanceSetsTLSqlfile;
+
+			TargetValidator.fndMenusSqlfile = sqlPath + TargetValidator.fndMenusSqlfile;
+			TargetValidator.fndMenusTLSqlfile = sqlPath + TargetValidator.fndMenusTLSqlfile;
+
 			if (csmJarFilePath == null || "".equals(csmJarFilePath) || !new File(csmJarFilePath).exists()) {
 				logger.log(Level.INFO, "Provide a valid CSM path");
-				throw new FileNotFoundException("CSM Jar path is not valid");
+				throw new FileNotFoundException("CSM Jar path is not valid: " + csmJarFilePath);
 			}
 			logger.log(Level.INFO, "Reading the CSM jar file");
 
@@ -79,7 +96,7 @@ public class DSMain {
 			logger.log(Level.INFO, "Source Custom object Size : " + customObjectSourceMap.keySet().size());
 			logger.log(Level.INFO, "Source OOTB object Size : " + ootbSourceObjectMap.keySet().size());
 
-			// if (DataSecurityProccessor.validateSourceData(customObjectSourceMap)) {
+			// Validating Source CSM jar
 			if (SourceCsmValidator.validateSourceData(customObjectSourceMap)) {
 				logger.log(Level.INFO, "Source CSM data is Valid");
 			} else {
@@ -87,23 +104,23 @@ public class DSMain {
 
 			}
 
-			ootbTargetObjectMap = DSObjectsTargetProcessor.extractFndObjects(ootbSourceObjectMap);
+			if (ootbSourceObjectMap != null && ootbSourceObjectMap.size() > 0) {
+				ootbTargetObjectMap = DSObjectsTargetProcessor.extractFndObjects(ootbSourceObjectMap);
+				logger.log(Level.INFO, "Target OOTB object Size : " + ootbTargetObjectMap.keySet().size());
+				TargetValidator.truncateExistingFiles();
 
-			// testing
-			for (Object obj : ootbSourceObjectMap.get(testObjName).get(DataSecurityObjects.FORM_FUNCIONS)) {
-				FndFormFunction fndFormFunction = (FndFormFunction) obj;
-				if (fndFormFunction.getFunctionName().equals("OKC_MANAGE_CONTRACT_DATA")) {
-					System.out.println(fndFormFunction.getFunctionName() + "\n");
-				}
+				// Compare Source and target data and create insert queries to rectify target
+				TargetValidator.validate(ootbSourceObjectMap, ootbTargetObjectMap);
+
+			} else {
+				logger.log(Level.INFO, " Source CSM Does not have any objects! ");
+
 			}
-
-			logger.log(Level.INFO, "Target OOTB object Size : " + ootbTargetObjectMap.keySet().size());
-
-			// Compare Source and target data and create insert queries to rectify target
-			TargetValidator.validate(ootbSourceObjectMap, ootbTargetObjectMap);
 
 			logger.log(Level.INFO,
 					"Total time taken for execution " + (System.currentTimeMillis() - start) / 1000 + " seconds");
+
+			System.exit(0);
 
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
